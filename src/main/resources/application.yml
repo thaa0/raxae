@@ -1,1 +1,11 @@
-spring.application.name=raxae
+spring:
+  application:
+    name: raxae
+
+server:
+  servlet:
+    context-path: /raxae/api
+
+springdoc:
+  swagger-ui:
+    path: /swagger
