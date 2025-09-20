@@ -3,6 +3,7 @@ package com.divertech.raxae.notificacao.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class Notificacao {
     @Id
@@ -23,6 +24,7 @@ public class Notificacao {
     @NotBlank
     private String mensagem;
     private LocalDateTime dataEnvio;
+    @Enumerated(EnumType.STRING)
     private StatusNotificacao statusNotificacao;
     private LocalDateTime dataLeitura;
 }
