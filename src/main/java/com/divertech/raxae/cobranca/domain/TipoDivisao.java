@@ -1,5 +1,5 @@
 package com.divertech.raxae.cobranca.domain;
 
 public enum TipoDivisao {
-    IGUALITARIA, PERSONALIZADA;
+    IGUALITARIA, POR_VALOR, POR_PERCENTUAL;
 }
