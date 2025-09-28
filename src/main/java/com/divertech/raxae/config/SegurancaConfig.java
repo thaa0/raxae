@@ -17,15 +17,21 @@ public class SegurancaConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(toH2Console()).permitAll()
-                .requestMatchers("/api/**").permitAll() 
-                .anyRequest().authenticated()
-            )
-            .headers(headers -> headers
-                .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
-            );
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/h2-console/**",
+                                "/raxae/api/swagger-ui/**",
+                                "/raxae/api/v3/api-docs/**",
+                                "/raxae/api/swagger/**",
+                                "/raxae/api/**" // se quiser liberar tudo no teu contexto
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                );
+
         return http.build();
     }
 }

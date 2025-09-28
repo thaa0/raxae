@@ -19,7 +19,7 @@ spring:
       
 server:
   servlet:
-    context-path: /raxae
+    context-path: /raxae/api
 
 springdoc:
   swagger-ui:

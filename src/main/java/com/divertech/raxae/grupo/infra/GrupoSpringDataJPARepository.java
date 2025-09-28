@@ -1,4 +1,4 @@
-package com.divertech.raxae.grupo.repository;
+package com.divertech.raxae.grupo.infra;
 
 import com.divertech.raxae.grupo.domain.Grupo;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
-@Repository
-public interface GrupoRepositorio extends JpaRepository<Grupo, UUID> {
+
+public interface GrupoSpringDataJPARepository extends JpaRepository<Grupo, UUID> {
 }
