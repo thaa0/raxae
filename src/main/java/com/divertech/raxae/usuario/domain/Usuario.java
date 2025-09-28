@@ -2,10 +2,12 @@ package com.divertech.raxae.usuario.domain;
 
 import com.divertech.raxae.plano.domain.TipoPlano;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +19,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Usuario implements UserDetails {
     @Id
@@ -25,9 +28,11 @@ public class Usuario implements UserDetails {
     private UUID id;
     @NotBlank(message = "Campo não pode ser em branco")
     private String nomeCompleto;
-    @NotBlank(message = "Campo não pode ser em branco")
+    @Email
+    @Column(unique = true)
     private String email;
     @NotNull
+    @Getter(AccessLevel.NONE)
     @Size(max = 60)
     private String senha;
     private TipoPlano tipo;
@@ -35,9 +40,9 @@ public class Usuario implements UserDetails {
     private String whatsapp;
     private LocalDateTime momentoCriacao;
 
-    public Usuario(UsuarioRequest usuarioRequest) {
+    public Usuario(UsuarioRequest usuarioRequest, BCryptPasswordEncoder passwordEncoder) {
         this.whatsapp = usuarioRequest.getWhatsapp();
-        this.senha = new BCryptPasswordEncoder().encode(usuarioRequest.getSenha());;
+        this.senha = passwordEncoder.encode(usuarioRequest.getSenha());;
         this.email = usuarioRequest.getEmail();
         this.nomeCompleto = usuarioRequest.getNomeCompleto();
         this.tipo = TipoPlano.GRATUITO;
@@ -48,32 +53,26 @@ public class Usuario implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
     }
-
     @Override
     public String getPassword() {
         return this.senha;
     }
-
     @Override
     public String getUsername() {
         return this.email;
     }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
-
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
-
     @Override
     public boolean isEnabled() {
         return true;
