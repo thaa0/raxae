@@ -24,3 +24,8 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger
+
+raxae:
+  jwt:
+    expiracao: 43200000
+    chave: m7UoDqT1UjKg0mPVv8WrBpdFjM9iM0Jr9N9Z4VbVXZl4r7y3hwc5v1bOq/MLjW7W9RhtFJvFsBLOdN0bY9VYhw==

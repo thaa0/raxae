@@ -1,6 +1,7 @@
 package com.divertech.raxae.usuario.domain;
 
 import com.divertech.raxae.plano.domain.TipoPlano;
+import com.divertech.raxae.usuario.application.controller.UsuarioRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

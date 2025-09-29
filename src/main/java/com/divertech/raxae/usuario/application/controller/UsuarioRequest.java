@@ -1,4 +1,4 @@
-package com.divertech.raxae.usuario.domain;
+package com.divertech.raxae.usuario.application.controller;
 
 import lombok.Getter;
 

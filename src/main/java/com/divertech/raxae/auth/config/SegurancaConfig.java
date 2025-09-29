@@ -1,15 +1,15 @@
-package com.divertech.raxae.config;
+package com.divertech.raxae.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @Configuration
 @EnableWebSecurity
@@ -22,10 +22,10 @@ public class SegurancaConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/h2-console/**",
-                                "/raxae/api/swagger-ui/**",
-                                "/raxae/api/v3/api-docs/**",
-                                "/raxae/api/swagger/**",
-                                "/raxae/api/**" // se quiser liberar tudo no teu contexto
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/v1/auth/cadastro",
+                                "/v1/auth/login"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -38,5 +38,10 @@ public class SegurancaConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

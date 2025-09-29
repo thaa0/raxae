@@ -4,6 +4,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,13 +24,21 @@ public class RestResponseEntityExceptionHandler {
 		return ex.buildErrorResponseEntity();
 	}
 
-//	@ExceptionHandler(InternalAuthenticationServiceException.class)
-//	public ResponseEntity<ErrorApiResponse> handlerBadCredentialsException(InternalAuthenticationServiceException ex) {
-//		log.error("Exception: ", ex);
-//		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//				.body(ErrorApiResponse.builder().description("CREDENCIAL ERROR!")
-//						.message("USUARIO OU SENHA ESTÃO INVÁLIDOS").build());
-//	}
+	@ExceptionHandler(InternalAuthenticationServiceException.class)
+	public ResponseEntity<ErrorApiResponse> handlerBadCredentialsException(InternalAuthenticationServiceException ex) {
+		log.error("Exception: ", ex);
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ErrorApiResponse.builder().description("CREDENCIAL ERROR!")
+						.message("USUARIO OU SENHA ESTÃO INVÁLIDOS").build());
+	}
+
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ErrorApiResponse> handlerBadCredentialsException(BadCredentialsException ex) {
+		log.error("Exception: ", ex);
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ErrorApiResponse.builder().description("CREDENCIAL ERROR!")
+						.message("USUARIO OU SENHA ESTÃO INVÁLIDOS").build());
+	}
 
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<ErrorApiResponse> handlerDataIntegrityException(DataIntegrityViolationException ex) {
