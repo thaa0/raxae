@@ -2,6 +2,21 @@ spring:
   application:
     name: raxae
 
+  datasource:
+    url: jdbc:h2:mem:raxadb
+    driverClassName: org.h2.Driver
+    username: raxae
+    password: raxae123
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+
 server:
   servlet:
     context-path: /raxae/api
@@ -9,3 +24,8 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger
+
+raxae:
+  jwt:
+    expiracao: 43200000
+    chave: m7UoDqT1UjKg0mPVv8WrBpdFjM9iM0Jr9N9Z4VbVXZl4r7y3hwc5v1bOq/MLjW7W9RhtFJvFsBLOdN0bY9VYhw==
