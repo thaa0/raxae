@@ -33,7 +33,7 @@ public class JwtApplicationService implements JwtService {
                 .claim("nomeCompleto", usuario.getNomeCompleto())
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(LocalDateTime.now()
-                        .plusMinutes(Long.parseLong(expiracao))
+                        .plus(java.time.Duration.ofMillis(Long.parseLong(expiracao)))
                         .atZone(ZoneId.systemDefault())
                         .toInstant()))
                 .signWith(SignatureAlgorithm.HS256, chave)
