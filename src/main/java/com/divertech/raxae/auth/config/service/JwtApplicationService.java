@@ -56,7 +56,11 @@ public class JwtApplicationService implements JwtService {
 
     public Optional<String> getUsuarioByBearerToken(String token) {
         log.info("[inicio] TokenService - getUsuarioByBearerToken");
-        String bearerToken = token.substring(7,token.length());
+        if (token == null || token.length() < 7 || !token.startsWith("Bearer ")) {
+            log.warn("Token inválido ou ausente o prefixo 'Bearer '");
+            return Optional.empty();
+        }
+        String bearerToken = token.substring(7);
         log.info(token);
         log.info("[finaliza] TokenService - getUsuarioByBearerToken");
         return this.getUsuario(bearerToken);
