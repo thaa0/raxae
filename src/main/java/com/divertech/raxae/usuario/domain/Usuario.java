@@ -45,7 +45,7 @@ public class Usuario implements UserDetails {
 
     public Usuario(UsuarioRequest usuarioRequest, BCryptPasswordEncoder passwordEncoder) {
         this.whatsapp = usuarioRequest.getWhatsapp();
-        this.senha = passwordEncoder.encode(usuarioRequest.getSenha());;
+        this.senha = passwordEncoder.encode(usuarioRequest.getSenha());
         this.email = usuarioRequest.getEmail();
         this.nomeCompleto = usuarioRequest.getNomeCompleto();
         this.tipo = TipoPlano.GRATUITO;
