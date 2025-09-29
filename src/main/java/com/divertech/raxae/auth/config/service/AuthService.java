@@ -6,4 +6,5 @@ import jakarta.validation.Valid;
 
 public interface AuthService {
     Token login(@Valid LoginRequest request);
+    Credencial buscaCredencialPorUsuario(String usuario);
 }

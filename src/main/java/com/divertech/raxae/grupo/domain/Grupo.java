@@ -1,5 +1,6 @@
 package com.divertech.raxae.grupo.domain;
 
+import com.divertech.raxae.cobranca.domain.Despesa;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,4 +31,11 @@ public class Grupo {
     @NotNull
     private UUID adminId;
     private LocalDateTime dataCriacao;
+    @OneToMany
+    @JoinColumn(name = "despesa_id")
+    private List<Despesa> despesas;
+    @OneToMany
+    @JoinColumn(name = "membros_id")
+    private List<Membro> membros;
+
 }
