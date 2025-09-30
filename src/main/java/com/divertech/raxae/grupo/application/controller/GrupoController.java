@@ -52,7 +52,6 @@ public class GrupoController {
         return ResponseEntity.ok(grupoResponse);
     }
 
-    // Patch para editar informações de um grupo. Retorna um GrupoResponse atualizado e recebe um GrupoEditaRequest. Somente o administrador do grupo pode editar as informações do grupo, checar se o user é um administrador comparando o id do adm do grupo com o id do usuario que esta fazendo a request atraves do token.
     @PatchMapping("/{idDoGrupo}")
     public ResponseEntity<GrupoResponse> editarGrupo(@PathVariable UUID idDoGrupo,
             @RequestBody GrupoEditaRequest grupoEditaRequest,
