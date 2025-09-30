@@ -2,6 +2,7 @@ package com.divertech.raxae.auth.config;
 
 import com.divertech.raxae.auth.config.service.JwtService;
 import com.divertech.raxae.auth.config.service.UsuarioDetailsService;
+import com.divertech.raxae.auth.domain.ValidaConteudoAuthorizationHeader;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,8 +69,9 @@ public class FiltroToken extends OncePerRequestFilter {
         String path = request.getRequestURI();
         return path.contains("/public/") ||
                 path.contains("/swagger-ui/") ||
-                path.contains("/v1/auth/cadastro") ||  // adiciona cadastro
-                path.contains("/v1/auth/login");      // adiciona login
+                path.contains("/v1/auth/cadastro") ||
+                path.contains("/v1/auth/login") ||
+                path.contains("/h2-console");
     }
 
 }

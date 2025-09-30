@@ -32,4 +32,11 @@ public class GrupoInfraRepository implements GrupoRepository {
         grupoSpringDataJPARepository.delete(grupo);
         log.debug("[finish] GrupoInfraRepository - apagaGrupoPorId");
     }
+
+    @Override
+    public void salva(Grupo grupo) {
+        log.info("[start] GrupoInfraRepository - salva");
+        grupoSpringDataJPARepository.save(grupo);
+        log.debug("[finish] GrupoInfraRepository - salva");
+    }
 }

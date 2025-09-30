@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface GrupoRepository {
     Grupo buscaGrupoPorId(UUID idDoGrupo);
     void apagaGrupo(Grupo grupo);
+    void salva(Grupo grupo);
 }

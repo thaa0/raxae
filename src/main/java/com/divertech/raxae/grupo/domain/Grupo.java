@@ -1,6 +1,7 @@
 package com.divertech.raxae.grupo.domain;
 
 import com.divertech.raxae.cobranca.domain.Despesa;
+import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +24,7 @@ public class Grupo {
     @Column(columnDefinition = "uuid", updatable = false, unique = true, nullable = false)
     private UUID id;
     @NotBlank
+    @Column(unique = true)
     private String nomeGrupo;
     @NotBlank
     private String descricao;
@@ -38,4 +40,13 @@ public class Grupo {
     @JoinColumn(name = "membros_id")
     private List<Membro> membros;
 
+    public Grupo(GrupoNovoRequest grupoRequest) {
+        this.nomeGrupo = grupoRequest.getNomeGrupo();
+        this.descricao = grupoRequest.getDescricao();
+        this.icone = grupoRequest.getIcone();
+        this.adminId = UUID.fromString(grupoRequest.getIdUserAdmin());
+        this.dataCriacao = LocalDateTime.now();
+        this.despesas = null;
+        this.membros = null;
+    }
 }

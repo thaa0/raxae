@@ -6,5 +6,5 @@ import java.util.UUID;
 
 public interface GrupoService {
     void deletarGrupo(UUID idDoGrupo, UUID id);
-    void criaGrupo(GrupoNovoRequest grupoRequest, String token);
+    void criaGrupo(GrupoNovoRequest grupoRequest);
 }

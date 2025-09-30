@@ -31,11 +31,11 @@ public class AuthApplicationService implements AuthService {
     }
 
     @Override
-    public Usuario buscaCredencialPorUsuario(String usuario) {
+    public Usuario buscaCredencialPorUsuario(String email) {
         log.info("[start] AuthApplicationService - buscaCredencialPorUsuario");
-        Usuario credencial = usuarioRepository.buscaUsuario(usuario);
+        Usuario usuario = usuarioRepository.buscaUsuario(email);
         log.debug("[finish] AuthApplicationService - buscaCredencialPorUsuario");
-        return credencial;
+        return usuario;
     }
 
     private void autentica(LoginRequest request) {

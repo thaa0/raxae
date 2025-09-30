@@ -21,10 +21,9 @@ public class GrupoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest,
-                          @RequestHeader(name = "Authorization", required = true) String token){
+    public void criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest){
         log.info("[start] GrupoController - criaGrupo");
-        grupoService.criaGrupo(grupoNovoRequest, token);
+        grupoService.criaGrupo(grupoNovoRequest);
         log.debug("[finish] GrupoController - criaGrupo");
     }
 
