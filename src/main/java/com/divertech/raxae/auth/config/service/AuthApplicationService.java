@@ -6,17 +6,19 @@ import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class AuthApplicationService implements AuthService {
-    private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
+    private final @Lazy AuthenticationManager authenticationManager;
 
     @Override
     public Token login(LoginRequest request) {
@@ -28,11 +30,21 @@ public class AuthApplicationService implements AuthService {
         return new Token("Bearer", token, usuario.getId());
     }
 
+    @Override
+    public Usuario buscaCredencialPorUsuario(String usuario) {
+        log.info("[start] AuthApplicationService - buscaCredencialPorUsuario");
+        Usuario credencial = usuarioRepository.buscaUsuario(usuario);
+        log.debug("[finish] AuthApplicationService - buscaCredencialPorUsuario");
+        return credencial;
+    }
+
     private void autentica(LoginRequest request) {
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getSenha());
-        authenticationManager.authenticate(authToken);
+        try {
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha());
+            authenticationManager.authenticate(authToken);
+        } catch (Exception e) {
+            throw new RuntimeException("Falha na autenticação", e);
+        }
     }
 }

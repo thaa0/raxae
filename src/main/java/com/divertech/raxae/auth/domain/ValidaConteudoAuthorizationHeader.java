@@ -1,4 +1,4 @@
-package com.divertech.raxae.auth.config;
+package com.divertech.raxae.auth.domain;
 
 
 import java.util.function.Predicate;
