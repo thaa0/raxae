@@ -9,4 +9,5 @@ public interface JwtService {
     String gerarToken(Usuario usuario);
     Optional<String> getUsuarioByBearerToken(String token);
     String gerarToken(Authentication authentication);
+    Optional<String> getUsuario(String token);
 }

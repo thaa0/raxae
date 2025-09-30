@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface GrupoRepository {
-    Grupo buscaGrupoPorId(UUID idDoGrupo);
+    Optional<Grupo> buscaGrupoPorId(UUID idDoGrupo);
     void apagaGrupo(Grupo grupo);
     void salva(Grupo grupo);
     void editarGrupo(UUID idDoGrupo, GrupoEditaRequest grupoEditaRequest);

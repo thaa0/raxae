@@ -6,10 +6,7 @@ import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,19 +22,28 @@ public class Grupo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(columnDefinition = "uuid", updatable = false, unique = true, nullable = false)
     private UUID id;
+    
     @NotBlank
     @Column(unique = true)
     private String nomeGrupo;
+    
     @NotBlank
     private String descricao;
+    
     @NotBlank
     private String icone;
+    
     @NotNull
     private UUID adminId;
+    
+    private boolean ativo = true;
+    
     private LocalDateTime dataCriacao;
+    
     @OneToMany
     @JoinColumn(name = "grupo_id")
     private List<Despesa> despesas;
+    
     @OneToMany
     @JoinColumn(name = "grupo_id")
     private List<Membro> membros;
@@ -62,5 +68,17 @@ public class Grupo {
         if (grupoEditaRequest.getIcone() != null && !grupoEditaRequest.getIcone().isBlank()) {
             this.icone = grupoEditaRequest.getIcone();
         }
+    }
+
+
+    public void desativa() {
+        this.ativo = false;
+    }
+
+    public Grupo validaAdmin(UUID idUsuario) {
+        if (!this.adminId.equals(idUsuario)) {
+            throw new RuntimeException("Usuário não é administrador do grupo.");
+        }
+        return this;
     }
 }

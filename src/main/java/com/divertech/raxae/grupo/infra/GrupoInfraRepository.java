@@ -3,10 +3,8 @@ package com.divertech.raxae.grupo.infra;
 import com.divertech.raxae.grupo.application.controller.GrupoEditaRequest;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
-import com.divertech.raxae.handler.APIException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -17,21 +15,20 @@ import java.util.UUID;
 @Log4j2
 public class GrupoInfraRepository implements GrupoRepository {
     private final GrupoSpringDataJPARepository grupoSpringDataJPARepository;
+
     @Override
-    public Grupo buscaGrupoPorId(UUID idDoGrupo) {
+    public Optional<Grupo> buscaGrupoPorId(UUID idDoGrupo) {
         log.info("[start] GrupoInfraRepository - buscaGrupoPorId");
-        Grupo grupo = grupoSpringDataJPARepository.findById(idDoGrupo)
-                .orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Grupo não encontrado!"));
+        Optional<Grupo> grupo = grupoSpringDataJPARepository.findById(idDoGrupo);
         log.debug("[finish] GrupoInfraRepository - buscaGrupoPorId");
         return grupo;
-
     }
 
     @Override
     public void apagaGrupo(Grupo grupo) {
-        log.info("[start] GrupoInfraRepository - apagaGrupoPorId");
+        log.info("[start] GrupoInfraRepository - apagaGrupo");
         grupoSpringDataJPARepository.delete(grupo);
-        log.debug("[finish] GrupoInfraRepository - apagaGrupoPorId");
+        log.debug("[finish] GrupoInfraRepository - apagaGrupo");
     }
 
     @Override
@@ -44,15 +41,10 @@ public class GrupoInfraRepository implements GrupoRepository {
     @Override
     public void editarGrupo(UUID idDoGrupo, GrupoEditaRequest grupoEditaRequest) {
         log.info("[start] GrupoInfraRepository - editarGrupo");
-        Optional<Grupo> grupoOptional = grupoSpringDataJPARepository.findById(idDoGrupo);
-        if (grupoOptional.isEmpty()) {
-            throw APIException.build(HttpStatus.NOT_FOUND, "Grupo não encontrado!");
-        }
-        Grupo grupo = grupoOptional.get();
-        grupo.atualizaInformacoes(grupoEditaRequest);
-        grupoSpringDataJPARepository.save(grupo);
+        grupoSpringDataJPARepository.findById(idDoGrupo).ifPresent(grupo -> {
+            grupo.atualizaInformacoes(grupoEditaRequest);
+            grupoSpringDataJPARepository.save(grupo);
+        });
         log.debug("[finish] GrupoInfraRepository - editarGrupo");
     }
-
-
 }

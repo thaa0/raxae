@@ -9,7 +9,6 @@ import lombok.extern.log4j.Log4j2;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,16 +23,23 @@ public class AuthApplicationService implements AuthService {
     public Token login(LoginRequest request) {
         log.info("[start] AuthApplicationService - login");
         autentica(request);
-        Usuario usuario = usuarioRepository.buscaUsuario(request.getEmail());
+
+        Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(request.getEmail())
+            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
         String token = jwtService.gerarToken(usuario);
         log.debug("[finish] AuthApplicationService - login");
+
         return new Token("Bearer", token, usuario.getId());
     }
 
     @Override
     public Usuario buscaCredencialPorUsuario(String email) {
         log.info("[start] AuthApplicationService - buscaCredencialPorUsuario");
-        Usuario usuario = usuarioRepository.buscaUsuario(email);
+
+        Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(email)
+            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
         log.debug("[finish] AuthApplicationService - buscaCredencialPorUsuario");
         return usuario;
     }

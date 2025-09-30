@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @Log4j2
@@ -17,17 +18,26 @@ public class UsuarioInfraRepository implements UsuarioRepository {
     private final UsuarioSpringDataJpaRepository usuarioSpringDataRepository;
 
     @Override
-    public void salva(Usuario usuario) {
+    public Usuario salva(Usuario usuario) {
         log.info("[start] UsuarioInfraRepository - salva");
-        usuarioSpringDataRepository.save(usuario);
+        Usuario salvo = usuarioSpringDataRepository.save(usuario);
         log.debug("[finish] UsuarioInfraRepository - salva");
+        return salvo;
     }
 
-    public Usuario buscaUsuario(String email){
-        log.info("[start] UsuarioInfraRepository - findByEmail");
-        Usuario usuario = usuarioSpringDataRepository.findByEmail(email)
-                .orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Usuário não encontrado!"));
-        log.debug("[finish] UsuarioInfraRepository - findByEmail");
+    @Override
+    public Optional<Usuario> buscaUsuarioPorEmail(String email) {
+        log.info("[start] UsuarioInfraRepository - buscaUsuarioPorEmail");
+        Optional<Usuario> usuario = usuarioSpringDataRepository.findByEmail(email);
+        log.debug("[finish] UsuarioInfraRepository - buscaUsuarioPorEmail");
+        return usuario;
+    }
+
+    @Override
+    public Optional<Usuario> buscaUsuarioPorId(UUID id) {
+        log.info("[start] UsuarioInfraRepository - buscaUsuarioPorId");
+        Optional<Usuario> usuario = usuarioSpringDataRepository.findById(id);
+        log.debug("[finish] UsuarioInfraRepository - buscaUsuarioPorId");
         return usuario;
     }
 }

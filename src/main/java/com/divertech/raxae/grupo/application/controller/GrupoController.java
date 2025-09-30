@@ -1,69 +1,40 @@
 package com.divertech.raxae.grupo.application.controller;
 
-import com.divertech.raxae.grupo.application.service.GrupoApplicationService;
 import com.divertech.raxae.grupo.application.service.GrupoService;
 import com.divertech.raxae.usuario.domain.Usuario;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/grupo")
-@RequiredArgsConstructor
+@RequestMapping("/api/v1/grupos")
 @Log4j2
+@RequiredArgsConstructor
 public class GrupoController {
-    private final GrupoService grupoService;
+    private final GrupoService service;
 
-    @PostMapping
+    @PostMapping("/{idDoGrupo}/membros")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<GrupoResponse> criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest){
-        log.info("[start] GrupoController - criaGrupo");
-        GrupoResponse grupoResponse = grupoService.criaGrupo(grupoNovoRequest);
-        log.debug("[finish] GrupoController - criaGrupo");
-        return ResponseEntity.status(HttpStatus.CREATED).body(grupoResponse);
+    public void adicionarMembro(
+            @PathVariable UUID idDoGrupo,
+            @Valid @RequestBody AdicionarMembroRequest adicionarMembroRequest,
+            @AuthenticationPrincipal Usuario usuarioAtual) {
+        log.info("[start] GrupoController - adicionarMembro");
+        service.adicionarMembro(idDoGrupo, adicionarMembroRequest, usuarioAtual.getId());
+        log.info("[finish] GrupoController - adicionarMembro");
     }
 
     @DeleteMapping("/{idDoGrupo}")
-    public ResponseEntity<Void> deletarGrupo(@PathVariable UUID idDoGrupo,
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarGrupo(
+            @PathVariable UUID idDoGrupo,
             @AuthenticationPrincipal Usuario usuarioAtual) {
         log.info("[start] GrupoController - deletarGrupo");
-        if (usuarioAtual == null) {
-            return ResponseEntity.status(401).build();
-        }
-        grupoService.deletarGrupo(idDoGrupo, usuarioAtual.getId());
-        log.debug("[finish] GrupoController - deletarGrupo");
-        return ResponseEntity.noContent().build();
+        service.deletarGrupo(idDoGrupo, usuarioAtual.getId());
+        log.info("[finish] GrupoController - deletarGrupo");
     }
-
-    @GetMapping("/{idDoGrupo}")
-    public ResponseEntity<GrupoResponse> getGrupoById(@PathVariable UUID idDoGrupo,
-            @AuthenticationPrincipal Usuario usuarioAtual) {
-        log.info("[start] GrupoController - getGrupoById");
-        if (usuarioAtual == null) {
-            return ResponseEntity.status(401).build();
-        }
-        GrupoResponse grupoResponse = grupoService.getGrupoById(idDoGrupo, usuarioAtual.getId());
-        log.debug("[finish] GrupoController - getGrupoById");
-        return ResponseEntity.ok(grupoResponse);
-    }
-
-    @PatchMapping("/{idDoGrupo}")
-    public ResponseEntity<GrupoResponse> editarGrupo(@PathVariable UUID idDoGrupo,
-            @RequestBody GrupoEditaRequest grupoEditaRequest,
-            @AuthenticationPrincipal Usuario usuarioAtual) {
-        log.info("[start] GrupoController - editarGrupo");
-        if (usuarioAtual == null) {
-            return ResponseEntity.status(401).build();
-        }
-        grupoService.editarGrupo(idDoGrupo, grupoEditaRequest, usuarioAtual.getId());
-        GrupoResponse grupoResponse = grupoService.getGrupoById(idDoGrupo, usuarioAtual.getId());
-        log.debug("[finish] GrupoController - editarGrupo");
-        return ResponseEntity.ok(grupoResponse);
-    }
-
 }

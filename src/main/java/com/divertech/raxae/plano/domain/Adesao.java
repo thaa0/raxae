@@ -1,14 +1,11 @@
 package com.divertech.raxae.plano.domain;
 
-
-import com.divertech.raxae.usuario.domain.Usuario;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
