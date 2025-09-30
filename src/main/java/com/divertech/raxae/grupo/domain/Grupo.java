@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +47,7 @@ public class Grupo {
         this.icone = grupoRequest.getIcone();
         this.adminId = UUID.fromString(grupoRequest.getIdUserAdmin());
         this.dataCriacao = LocalDateTime.now();
-        this.despesas = null;
-        this.membros = null;
+        this.despesas = new ArrayList<>();
+        this.membros = new ArrayList<>();
     }
 }
