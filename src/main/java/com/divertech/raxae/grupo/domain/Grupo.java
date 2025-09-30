@@ -1,6 +1,7 @@
 package com.divertech.raxae.grupo.domain;
 
 import com.divertech.raxae.cobranca.domain.Despesa;
+import com.divertech.raxae.grupo.application.controller.GrupoEditaRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -49,5 +50,17 @@ public class Grupo {
         this.dataCriacao = LocalDateTime.now();
         this.despesas = new ArrayList<>();
         this.membros = new ArrayList<>();
+    }
+
+    public void atualizaInformacoes(GrupoEditaRequest grupoEditaRequest) {
+        if (grupoEditaRequest.getNomeGrupo() != null && !grupoEditaRequest.getNomeGrupo().isBlank()) {
+            this.nomeGrupo = grupoEditaRequest.getNomeGrupo();
+        }
+        if (grupoEditaRequest.getDescricao() != null && !grupoEditaRequest.getDescricao().isBlank()) {
+            this.descricao = grupoEditaRequest.getDescricao();
+        }
+        if (grupoEditaRequest.getIcone() != null && !grupoEditaRequest.getIcone().isBlank()) {
+            this.icone = grupoEditaRequest.getIcone();
+        }
     }
 }

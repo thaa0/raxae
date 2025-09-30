@@ -21,10 +21,11 @@ public class GrupoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest){
+    public ResponseEntity<GrupoResponse> criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest){
         log.info("[start] GrupoController - criaGrupo");
-        grupoService.criaGrupo(grupoNovoRequest);
+        GrupoResponse grupoResponse = grupoService.criaGrupo(grupoNovoRequest);
         log.debug("[finish] GrupoController - criaGrupo");
+        return ResponseEntity.status(HttpStatus.CREATED).body(grupoResponse);
     }
 
     @DeleteMapping("/{idDoGrupo}")
@@ -38,4 +39,32 @@ public class GrupoController {
         log.debug("[finish] GrupoController - deletarGrupo");
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{idDoGrupo}")
+    public ResponseEntity<GrupoResponse> getGrupoById(@PathVariable UUID idDoGrupo,
+            @AuthenticationPrincipal Usuario usuarioAtual) {
+        log.info("[start] GrupoController - getGrupoById");
+        if (usuarioAtual == null) {
+            return ResponseEntity.status(401).build();
+        }
+        GrupoResponse grupoResponse = grupoService.getGrupoById(idDoGrupo, usuarioAtual.getId());
+        log.debug("[finish] GrupoController - getGrupoById");
+        return ResponseEntity.ok(grupoResponse);
+    }
+
+    // Patch para editar informações de um grupo. Retorna um GrupoResponse atualizado e recebe um GrupoEditaRequest. Somente o administrador do grupo pode editar as informações do grupo, checar se o user é um administrador comparando o id do adm do grupo com o id do usuario que esta fazendo a request atraves do token.
+    @PatchMapping("/{idDoGrupo}")
+    public ResponseEntity<GrupoResponse> editarGrupo(@PathVariable UUID idDoGrupo,
+            @RequestBody GrupoEditaRequest grupoEditaRequest,
+            @AuthenticationPrincipal Usuario usuarioAtual) {
+        log.info("[start] GrupoController - editarGrupo");
+        if (usuarioAtual == null) {
+            return ResponseEntity.status(401).build();
+        }
+        grupoService.editarGrupo(idDoGrupo, grupoEditaRequest, usuarioAtual.getId());
+        GrupoResponse grupoResponse = grupoService.getGrupoById(idDoGrupo, usuarioAtual.getId());
+        log.debug("[finish] GrupoController - editarGrupo");
+        return ResponseEntity.ok(grupoResponse);
+    }
+
 }

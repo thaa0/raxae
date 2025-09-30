@@ -1,5 +1,6 @@
 package com.divertech.raxae.grupo.infra;
 
+import com.divertech.raxae.grupo.application.controller.GrupoEditaRequest;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
 import com.divertech.raxae.handler.APIException;
@@ -39,4 +40,19 @@ public class GrupoInfraRepository implements GrupoRepository {
         grupoSpringDataJPARepository.save(grupo);
         log.debug("[finish] GrupoInfraRepository - salva");
     }
+
+    @Override
+    public void editarGrupo(UUID idDoGrupo, GrupoEditaRequest grupoEditaRequest) {
+        log.info("[start] GrupoInfraRepository - editarGrupo");
+        Optional<Grupo> grupoOptional = grupoSpringDataJPARepository.findById(idDoGrupo);
+        if (grupoOptional.isEmpty()) {
+            throw APIException.build(HttpStatus.NOT_FOUND, "Grupo não encontrado!");
+        }
+        Grupo grupo = grupoOptional.get();
+        grupo.atualizaInformacoes(grupoEditaRequest);
+        grupoSpringDataJPARepository.save(grupo);
+        log.debug("[finish] GrupoInfraRepository - editarGrupo");
+    }
+
+
 }
