@@ -35,10 +35,10 @@ public class Grupo {
     private UUID adminId;
     private LocalDateTime dataCriacao;
     @OneToMany
-    @JoinColumn(name = "despesa_id")
+    @JoinColumn(name = "grupo_id")
     private List<Despesa> despesas;
     @OneToMany
-    @JoinColumn(name = "membros_id")
+    @JoinColumn(name = "grupo_id")
     private List<Membro> membros;
 
     public Grupo(GrupoNovoRequest grupoRequest) {
