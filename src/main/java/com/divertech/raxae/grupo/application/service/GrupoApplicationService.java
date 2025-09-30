@@ -1,8 +1,9 @@
 package com.divertech.raxae.grupo.application.service;
 
+import com.divertech.raxae.auth.config.service.JwtService;
+import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
-import com.divertech.raxae.handler.RecursoNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Log4j2
 public class GrupoApplicationService implements GrupoService {
     private final GrupoRepository grupoRepository;
+    private final JwtService jwtService;
 
     @Transactional
     public void deletarGrupo(UUID idDoGrupo, UUID idUsuarioAtual) {
@@ -24,6 +26,14 @@ public class GrupoApplicationService implements GrupoService {
         possuiPermissaoDeAdmin(idUsuarioAtual, grupo);
         grupoRepository.apagaGrupo(grupo);
         log.debug("[finish] GrupoApplicationService - deletarGrupo");
+    }
+
+    @Override
+    public void criaGrupo(GrupoNovoRequest grupoRequest) {
+        log.info("[start] GrupoApplicationService - criaGrupo");
+        Grupo grupo = new Grupo(grupoRequest);
+        grupoRepository.salva(grupo);
+        log.debug("[finish] GrupoApplicationService - criaGrupo");
     }
 
     private static void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {

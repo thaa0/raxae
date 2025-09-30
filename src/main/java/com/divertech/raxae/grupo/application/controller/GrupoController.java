@@ -5,6 +5,7 @@ import com.divertech.raxae.grupo.application.service.GrupoService;
 import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +13,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/grupos")
+@RequestMapping("/v1/grupo")
 @RequiredArgsConstructor
 @Log4j2
 public class GrupoController {
     private final GrupoService grupoService;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest){
+        log.info("[start] GrupoController - criaGrupo");
+        grupoService.criaGrupo(grupoNovoRequest);
+        log.debug("[finish] GrupoController - criaGrupo");
+    }
 
     @DeleteMapping("/{idDoGrupo}")
     public ResponseEntity<Void> deletarGrupo(@PathVariable UUID idDoGrupo,
