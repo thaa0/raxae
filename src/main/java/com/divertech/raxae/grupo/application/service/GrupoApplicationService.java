@@ -6,8 +6,10 @@ import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
+import com.divertech.raxae.handler.APIException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,9 +63,19 @@ public class GrupoApplicationService implements GrupoService {
         log.debug("[finish] GrupoApplicationService - editarGrupo");
     }
 
+    @Override
+    public void removerMembro(UUID idDoGrupo, UUID idDoMembro, UUID id) {
+        log.info("[start] GrupoApplicationService - removerMembro");
+        Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
+        possuiPermissaoDeAdmin(id, grupo);
+        grupo.removeMembro(idDoMembro);
+        grupoRepository.salva(grupo);
+        log.debug("[finish] GrupoApplicationService - removerMembro");
+    }
+
     private static void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
         if (!grupo.getAdminId().equals(idUsuarioAtual)) {
-            throw new AccessDeniedException("Usuário não autorizado para realizar alterações neste grupo.");
+            throw APIException.build(HttpStatus.UNAUTHORIZED,"Usuário não autorizado para realizar alterações neste grupo.");
         }
     }
 }

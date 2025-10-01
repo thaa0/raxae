@@ -38,8 +38,7 @@ public class Grupo {
     @OneToMany
     @JoinColumn(name = "grupo_id")
     private List<Despesa> despesas;
-    @OneToMany
-    @JoinColumn(name = "grupo_id")
+    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Membro> membros;
 
     public Grupo(GrupoNovoRequest grupoRequest) {
@@ -61,6 +60,14 @@ public class Grupo {
         }
         if (grupoEditaRequest.getIcone() != null && !grupoEditaRequest.getIcone().isBlank()) {
             this.icone = grupoEditaRequest.getIcone();
+        }
+    }
+    public void removeMembro(UUID idDoMembro) {
+        for (Membro membro : membros) {
+            if (membro.getUsuario().getId().equals(idDoMembro)) {
+                membro.removeMembro();
+                break;
+            }
         }
     }
 }

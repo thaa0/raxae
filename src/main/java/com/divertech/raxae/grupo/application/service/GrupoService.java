@@ -11,4 +11,5 @@ public interface GrupoService {
     GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest);
     GrupoResponse getGrupoById(UUID idDoGrupo, UUID id);
     void editarGrupo(UUID idDoGrupo, GrupoEditaRequest grupoEditaRequest, UUID id);
+    void removerMembro(UUID idDoGrupo, UUID idDoMembro, UUID id);
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -53,6 +54,4 @@ public class GrupoInfraRepository implements GrupoRepository {
         grupoSpringDataJPARepository.save(grupo);
         log.debug("[finish] GrupoInfraRepository - editarGrupo");
     }
-
-
 }
