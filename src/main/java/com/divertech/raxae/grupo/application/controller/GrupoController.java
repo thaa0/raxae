@@ -66,4 +66,16 @@ public class GrupoController {
         return ResponseEntity.ok(grupoResponse);
     }
 
+    @PatchMapping("/{idDoGrupo}/membro/{idDoMembro}/remover")
+    public ResponseEntity<Void> removerMembro(@PathVariable UUID idDoGrupo,
+            @PathVariable UUID idDoMembro,
+            @AuthenticationPrincipal Usuario usuarioAtual) {
+        log.info("[start] GrupoController - removerMembro");
+        if (usuarioAtual == null) {
+            return ResponseEntity.status(401).build();
+        }
+        grupoService.removerMembro(idDoGrupo, idDoMembro, usuarioAtual.getId());
+        log.debug("[finish] GrupoController - removerMembro");
+        return ResponseEntity.noContent().build();
+    }
 }

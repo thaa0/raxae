@@ -61,6 +61,15 @@ public class GrupoApplicationService implements GrupoService {
         log.debug("[finish] GrupoApplicationService - editarGrupo");
     }
 
+    @Override
+    public void removerMembro(UUID idDoGrupo, UUID idDoMembro, UUID id) {
+        log.info("[start] GrupoApplicationService - removerMembro");
+        Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
+        possuiPermissaoDeAdmin(id, grupo);
+        grupoRepository.removeMembroDoGrupo(idDoGrupo, idDoMembro);
+        log.debug("[finish] GrupoApplicationService - removerMembro");
+    }
+
     private static void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
         if (!grupo.getAdminId().equals(idUsuarioAtual)) {
             throw new AccessDeniedException("Usuário não autorizado para realizar alterações neste grupo.");

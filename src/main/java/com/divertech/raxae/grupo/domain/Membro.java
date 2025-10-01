@@ -30,4 +30,10 @@ public class Membro {
     private LocalDateTime dataEntrada;
     private LocalDateTime dataCriacao;
 
+    public void removeMembro() {
+        if(this.statusParticipacao == StatusParticipacao.REMOVIDO) {
+            return;
+        }
+        this.statusParticipacao = StatusParticipacao.REMOVIDO;
+    }
 }
