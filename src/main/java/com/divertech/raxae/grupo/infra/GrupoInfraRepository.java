@@ -54,20 +54,4 @@ public class GrupoInfraRepository implements GrupoRepository {
         grupoSpringDataJPARepository.save(grupo);
         log.debug("[finish] GrupoInfraRepository - editarGrupo");
     }
-
-    @Override
-    @Transactional
-    public void removeMembroDoGrupo(UUID idDoGrupo, UUID idDoMembro) {
-        log.info("[start] GrupoInfraRepository - removeMembroDoGrupo");
-        Optional<Grupo> grupoOptional = grupoSpringDataJPARepository.findById(idDoGrupo);
-        if (grupoOptional.isEmpty()) {
-            throw APIException.build(HttpStatus.NOT_FOUND, "Grupo não encontrado!");
-        }
-        Grupo grupo = grupoOptional.get();
-        grupo.removeMembro(idDoMembro);
-        grupoSpringDataJPARepository.save(grupo);
-        log.debug("[finish] GrupoInfraRepository - removeMembroDoGrupo");
-    }
-
-
 }

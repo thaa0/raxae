@@ -11,5 +11,4 @@ public interface GrupoRepository {
     void apagaGrupo(Grupo grupo);
     void salva(Grupo grupo);
     void editarGrupo(UUID idDoGrupo, GrupoEditaRequest grupoEditaRequest);
-    void removeMembroDoGrupo(UUID idDoGrupo, UUID idDoMembro);
 }
