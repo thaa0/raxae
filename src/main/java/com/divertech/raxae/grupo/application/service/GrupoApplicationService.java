@@ -1,28 +1,42 @@
 package com.divertech.raxae.grupo.application.service;
 
-import com.divertech.raxae.auth.config.service.JwtService;
 import com.divertech.raxae.grupo.application.controller.GrupoEditaRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
 import com.divertech.raxae.handler.APIException;
+import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
+import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class GrupoApplicationService implements GrupoService {
-    private final GrupoRepository grupoRepository;
-    private final JwtService jwtService;
 
+    private final GrupoRepository grupoRepository;
+    private final UsuarioRepository usuarioRepository;
+
+    @Override
+    @Transactional
+    public GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest) {
+        log.info("[start] GrupoApplicationService - criaGrupo");
+        Usuario admin = usuarioRepository.buscaUsuarioPorId(UUID.fromString(grupoRequest.getIdUserAdmin()));
+        Grupo grupo = new Grupo(grupoRequest);
+        grupo.setAdministrador(admin);
+        grupoRepository.salva(grupo);
+        log.debug("[finish] GrupoApplicationService - criaGrupo");
+        return new GrupoResponse(grupo);
+    }
+
+    @Override
     @Transactional
     public void deletarGrupo(UUID idDoGrupo, UUID idUsuarioAtual) {
         log.info("[start] GrupoApplicationService - deletarGrupo");
@@ -33,49 +47,58 @@ public class GrupoApplicationService implements GrupoService {
     }
 
     @Override
-    public GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest) {
-        log.info("[start] GrupoApplicationService - criaGrupo");
-        Grupo grupo = new Grupo(grupoRequest);
-        grupoRepository.salva(grupo);
-        GrupoResponse grupoResponse = new GrupoResponse(grupo);
-        log.debug("[finish] GrupoApplicationService - criaGrupo");
-        return grupoResponse;
-    }
-
-    @Override
-    public GrupoResponse getGrupoById(UUID idDoGrupo, UUID id) {
+    public GrupoResponse getGrupoById(UUID idDoGrupo, UUID idUsuarioAtual) {
         log.info("[start] GrupoApplicationService - getGrupoById");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
-        GrupoResponse grupoResponse = new GrupoResponse(grupo);
-        log.debug("[finish] GrupoApplicationService - getGrupoById");
-        return grupoResponse;
+        //Futuramente, pode-se adicionar uma lógica para verificar
+        // se o usuário atual é membro do grupo antes de retornar os dados.
+        return new GrupoResponse(grupo);
     }
 
     @Override
-    public void editarGrupo(UUID idDoGrupo, GrupoEditaRequest grupoEditaRequest, UUID id) {
+    @Transactional
+    public void editarGrupo(UUID idDoGrupo, GrupoEditaRequest grupoEditaRequest, UUID idUsuarioAtual) {
         log.info("[start] GrupoApplicationService - editarGrupo");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
-        log.info("Puxando Info do User:");
-        log.info(grupo.getAdminId() + "Id do Admin");
-        log.info(id + "Id do User Atual");
-        possuiPermissaoDeAdmin(id, grupo);
-        grupoRepository.editarGrupo(idDoGrupo, grupoEditaRequest);
+        possuiPermissaoDeAdmin(idUsuarioAtual, grupo);
+        grupo.atualizaInformacoes(grupoEditaRequest);
+        grupoRepository.salva(grupo);
         log.debug("[finish] GrupoApplicationService - editarGrupo");
     }
 
     @Override
-    public void removerMembro(UUID idDoGrupo, UUID idDoMembro, UUID id) {
+    @Transactional
+    public void removerMembro(UUID idDoGrupo, UUID idDoMembro, UUID idUsuarioAtual) {
         log.info("[start] GrupoApplicationService - removerMembro");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
-        possuiPermissaoDeAdmin(id, grupo);
+        possuiPermissaoDeAdmin(idUsuarioAtual, grupo);
         grupo.removeMembro(idDoMembro);
         grupoRepository.salva(grupo);
         log.debug("[finish] GrupoApplicationService - removerMembro");
     }
 
-    private static void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
+    @Override
+    @Transactional
+    public void adicionarMembro(UUID idGrupo, String emailNovoMembro) {
+        log.info("[start] GrupoApplicationService - adicionarMembro");
+        Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
+
+        String adminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!grupo.isAdmin(adminEmail)) {
+            throw APIException.build(HttpStatus.FORBIDDEN, "Apenas o administrador pode adicionar novos membros.");
+        }
+
+        Usuario usuarioParaAdicionar = usuarioRepository.buscaUsuarioPorEmail(emailNovoMembro.toLowerCase());
+        grupo.adicionaNovoMembro(usuarioParaAdicionar);
+        grupoRepository.salva(grupo);
+
+        log.info("Simulando envio de notificação de convite para {}", emailNovoMembro);
+        log.info("[finish] GrupoApplicationService - adicionarMembro");
+    }
+
+    private void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
         if (!grupo.getAdminId().equals(idUsuarioAtual)) {
-            throw APIException.build(HttpStatus.UNAUTHORIZED,"Usuário não autorizado para realizar alterações neste grupo.");
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário não autorizado para realizar alterações neste grupo.");
         }
     }
 }

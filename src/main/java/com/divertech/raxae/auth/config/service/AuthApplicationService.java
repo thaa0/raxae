@@ -1,21 +1,21 @@
 package com.divertech.raxae.auth.config.service;
 
-import com.divertech.raxae.usuario.application.controller.LoginRequest;
 import com.divertech.raxae.auth.domain.Token;
+import com.divertech.raxae.usuario.application.controller.LoginRequest;
 import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class AuthApplicationService implements AuthService {
+
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
     private final @Lazy AuthenticationManager authenticationManager;
@@ -24,7 +24,7 @@ public class AuthApplicationService implements AuthService {
     public Token login(LoginRequest request) {
         log.info("[start] AuthApplicationService - login");
         autentica(request);
-        Usuario usuario = usuarioRepository.buscaUsuario(request.getEmail());
+        Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(request.getEmail());
         String token = jwtService.gerarToken(usuario);
         log.debug("[finish] AuthApplicationService - login");
         return new Token("Bearer", token, usuario.getId());
@@ -33,7 +33,7 @@ public class AuthApplicationService implements AuthService {
     @Override
     public Usuario buscaCredencialPorUsuario(String email) {
         log.info("[start] AuthApplicationService - buscaCredencialPorUsuario");
-        Usuario usuario = usuarioRepository.buscaUsuario(email);
+        Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(email);
         log.debug("[finish] AuthApplicationService - buscaCredencialPorUsuario");
         return usuario;
     }
