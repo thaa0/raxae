@@ -2,6 +2,7 @@ package com.divertech.raxae.grupo.application.controller;
 
 import com.divertech.raxae.grupo.application.service.GrupoApplicationService;
 import com.divertech.raxae.grupo.application.service.GrupoService;
+import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -11,6 +12,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+
+import static com.divertech.raxae.handler.APIException.build;
 
 @RestController
 @RequestMapping("/v1/grupo")
@@ -77,5 +80,16 @@ public class GrupoController {
         grupoService.removerMembro(idDoGrupo, idDoMembro, usuarioAtual.getId());
         log.debug("[finish] GrupoController - removerMembro");
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{idDoGrupo}/convite")
+    @ResponseStatus(HttpStatus.OK)
+    public String geraConvite(@PathVariable UUID idDoGrupo, @AuthenticationPrincipal Usuario usuarioAtual){
+        log.info("[start] GrupoController - geraConvite");
+        if (usuarioAtual == null) {
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuario atual não autenticado");
+        }
+        log.debug("[finish] GrupoController - geraConvite");
+        return grupoService.geraConvite(idDoGrupo, usuarioAtual);
     }
 }

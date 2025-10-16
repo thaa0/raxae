@@ -10,6 +10,7 @@ import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ public class GrupoApplicationService implements GrupoService {
 
     private final GrupoRepository grupoRepository;
     private final UsuarioRepository usuarioRepository;
+    @Value("${app.base-url:http://localhost:8080/v1/grupo}")
+    private String baseUrl;
 
     @Override
     @Transactional
@@ -94,6 +97,13 @@ public class GrupoApplicationService implements GrupoService {
 
         log.info("Simulando envio de notificação de convite para {}", emailNovoMembro);
         log.info("[finish] GrupoApplicationService - adicionarMembro");
+    }
+
+    @Override
+    public String geraConvite(UUID idGrupo, Usuario usuarioAtual) {
+        Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
+        possuiPermissaoDeAdmin(usuarioAtual.getId(), grupo);
+        return baseUrl + idGrupo + "/join/";
     }
 
     private void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
