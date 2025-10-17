@@ -104,4 +104,8 @@ public class Grupo {
         if (this.administrador == null) return null;
         return this.administrador.getId();
     }
+
+    public Membro buscaMembro(Usuario usuario) {
+        return this.membros.stream() .filter(membro -> membro.getUsuario().getId().equals(usuario.getId())) .findFirst() .orElse(null);
+    }
 }

@@ -10,5 +10,4 @@ public class GrupoNovoRequest {
     private String nomeGrupo;
     private String descricao;
     private String icone;
-    private String idUserAdmin;
 }

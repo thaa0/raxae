@@ -5,6 +5,7 @@ import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
+import com.divertech.raxae.grupo.domain.StatusParticipacao;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
@@ -12,9 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.UUID;
 
 @Service
@@ -24,16 +25,17 @@ public class GrupoApplicationService implements GrupoService {
 
     private final GrupoRepository grupoRepository;
     private final UsuarioRepository usuarioRepository;
-    @Value("${app.base-url:http://localhost:8080/v1/grupo}")
+    @Value("${app.base-url:http://localhost:8080/raxae/api/v1/grupo/}")
     private String baseUrl;
 
     @Override
     @Transactional
-    public GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest) {
+    public GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest, Usuario usuarioAtual) {
         log.info("[start] GrupoApplicationService - criaGrupo");
-        Usuario admin = usuarioRepository.buscaUsuarioPorId(UUID.fromString(grupoRequest.getIdUserAdmin()));
+        Usuario admin = usuarioRepository.buscaUsuarioPorId(usuarioAtual.getId());
         Grupo grupo = new Grupo(grupoRequest);
         grupo.setAdministrador(admin);
+//        grupo.adicionaAdminComoMembro(usuarioAtual);
         grupoRepository.salva(grupo);
         log.debug("[finish] GrupoApplicationService - criaGrupo");
         return new GrupoResponse(grupo);
@@ -82,28 +84,28 @@ public class GrupoApplicationService implements GrupoService {
 
     @Override
     @Transactional
-    public void adicionarMembro(UUID idGrupo, String emailNovoMembro) {
+    public void adicionarMembro(UUID idGrupo, Usuario usuario) {
         log.info("[start] GrupoApplicationService - adicionarMembro");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
+        usuarioRepository.buscaUsuarioPorId(usuario.getId());
+        verificaSeMembroJaEstaNoGrupo(usuario,grupo);
+        grupo.adicionaNovoMembro(usuario);
+        grupoRepository.salva(grupo);
+        log.info("[finish] GrupoApplicationService - adicionarMembro");
+    }
 
-        String adminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!grupo.isAdmin(adminEmail)) {
-            throw APIException.build(HttpStatus.FORBIDDEN, "Apenas o administrador pode adicionar novos membros.");
+    private void verificaSeMembroJaEstaNoGrupo(Usuario usuario, Grupo grupo) {
+        if(grupo.buscaMembro(usuario)!=null){
+            throw APIException.build(HttpStatus.CONFLICT, "Usuario já esta no grupo!");
         }
 
-        Usuario usuarioParaAdicionar = usuarioRepository.buscaUsuarioPorEmail(emailNovoMembro.toLowerCase());
-        grupo.adicionaNovoMembro(usuarioParaAdicionar);
-        grupoRepository.salva(grupo);
-
-        log.info("Simulando envio de notificação de convite para {}", emailNovoMembro);
-        log.info("[finish] GrupoApplicationService - adicionarMembro");
     }
 
     @Override
     public String geraConvite(UUID idGrupo, Usuario usuarioAtual) {
         Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
         possuiPermissaoDeAdmin(usuarioAtual.getId(), grupo);
-        return baseUrl + idGrupo + "/join/";
+        return baseUrl + idGrupo + "/join";
     }
 
     private void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
