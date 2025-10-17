@@ -104,6 +104,7 @@ public class GrupoApplicationService implements GrupoService {
     @Override
     public String geraConvite(UUID idGrupo, Usuario usuarioAtual) {
         Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
+        grupo.adicionaNovoMembro(usuarioAtual);
         possuiPermissaoDeAdmin(usuarioAtual.getId(), grupo);
         return baseUrl + idGrupo + "/join";
     }

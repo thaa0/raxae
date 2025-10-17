@@ -2,10 +2,8 @@ package com.divertech.raxae.grupo.domain;
 
 import com.divertech.raxae.usuario.domain.Usuario;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.util.UUID;
 
 @Data
@@ -13,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Membro {
 
     @Id
@@ -26,6 +25,7 @@ public class Membro {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grupo_id", nullable = false)
+    @EqualsAndHashCode.Exclude
     private Grupo grupo;
 
     @Enumerated(EnumType.STRING)
