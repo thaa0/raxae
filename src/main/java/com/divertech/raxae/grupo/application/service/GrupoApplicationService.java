@@ -5,7 +5,6 @@ import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
-import com.divertech.raxae.grupo.domain.StatusParticipacao;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
