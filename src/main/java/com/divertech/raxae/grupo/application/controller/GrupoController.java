@@ -2,6 +2,7 @@ package com.divertech.raxae.grupo.application.controller;
 
 import com.divertech.raxae.grupo.application.service.GrupoApplicationService;
 import com.divertech.raxae.grupo.application.service.GrupoService;
+import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static com.divertech.raxae.handler.APIException.build;
+
 @RestController
 @RequestMapping("/v1/grupo")
 @RequiredArgsConstructor
@@ -21,9 +24,9 @@ public class GrupoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<GrupoResponse> criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest){
+    public ResponseEntity<GrupoResponse> criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest, @AuthenticationPrincipal Usuario usuarioAtual){
         log.info("[start] GrupoController - criaGrupo");
-        GrupoResponse grupoResponse = grupoService.criaGrupo(grupoNovoRequest);
+        GrupoResponse grupoResponse = grupoService.criaGrupo(grupoNovoRequest,usuarioAtual);
         log.debug("[finish] GrupoController - criaGrupo");
         return ResponseEntity.status(HttpStatus.CREATED).body(grupoResponse);
     }
@@ -32,9 +35,7 @@ public class GrupoController {
     public ResponseEntity<Void> deletarGrupo(@PathVariable UUID idDoGrupo,
             @AuthenticationPrincipal Usuario usuarioAtual) {
         log.info("[start] GrupoController - deletarGrupo");
-        if (usuarioAtual == null) {
-            return ResponseEntity.status(401).build();
-        }
+        verificaUsuarioAuth(usuarioAtual);
         grupoService.deletarGrupo(idDoGrupo, usuarioAtual.getId());
         log.debug("[finish] GrupoController - deletarGrupo");
         return ResponseEntity.noContent().build();
@@ -44,9 +45,7 @@ public class GrupoController {
     public ResponseEntity<GrupoResponse> getGrupoById(@PathVariable UUID idDoGrupo,
             @AuthenticationPrincipal Usuario usuarioAtual) {
         log.info("[start] GrupoController - getGrupoById");
-        if (usuarioAtual == null) {
-            return ResponseEntity.status(401).build();
-        }
+        verificaUsuarioAuth(usuarioAtual);
         GrupoResponse grupoResponse = grupoService.getGrupoById(idDoGrupo, usuarioAtual.getId());
         log.debug("[finish] GrupoController - getGrupoById");
         return ResponseEntity.ok(grupoResponse);
@@ -57,9 +56,7 @@ public class GrupoController {
             @RequestBody GrupoEditaRequest grupoEditaRequest,
             @AuthenticationPrincipal Usuario usuarioAtual) {
         log.info("[start] GrupoController - editarGrupo");
-        if (usuarioAtual == null) {
-            return ResponseEntity.status(401).build();
-        }
+        verificaUsuarioAuth(usuarioAtual);
         grupoService.editarGrupo(idDoGrupo, grupoEditaRequest, usuarioAtual.getId());
         GrupoResponse grupoResponse = grupoService.getGrupoById(idDoGrupo, usuarioAtual.getId());
         log.debug("[finish] GrupoController - editarGrupo");
@@ -71,11 +68,33 @@ public class GrupoController {
             @PathVariable UUID idDoMembro,
             @AuthenticationPrincipal Usuario usuarioAtual) {
         log.info("[start] GrupoController - removerMembro");
-        if (usuarioAtual == null) {
-            return ResponseEntity.status(401).build();
-        }
+        verificaUsuarioAuth(usuarioAtual);
         grupoService.removerMembro(idDoGrupo, idDoMembro, usuarioAtual.getId());
         log.debug("[finish] GrupoController - removerMembro");
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{idDoGrupo}/convite")
+    @ResponseStatus(HttpStatus.OK)
+    public String geraConvite(@PathVariable UUID idDoGrupo, @AuthenticationPrincipal Usuario usuarioAtual){
+        log.info("[start] GrupoController - geraConvite");
+        verificaUsuarioAuth(usuarioAtual);
+        log.debug("[finish] GrupoController - geraConvite");
+        return grupoService.geraConvite(idDoGrupo, usuarioAtual);
+    }
+
+    @GetMapping("/{idDoGrupo}/join")
+    @ResponseStatus(HttpStatus.OK)
+    public void joinGrupo(@PathVariable UUID idDoGrupo, @AuthenticationPrincipal Usuario usuarioAtual){
+        log.info("[start] GrupoController - geraConvite");
+        verificaUsuarioAuth(usuarioAtual);
+        grupoService.adicionarMembro(idDoGrupo, usuarioAtual);
+        log.debug("[finish] GrupoController - geraConvite");
+    }
+
+    private static void verificaUsuarioAuth(Usuario usuarioAtual) {
+        if (usuarioAtual == null) {
+            throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuario atual não autenticado");
+        }
     }
 }

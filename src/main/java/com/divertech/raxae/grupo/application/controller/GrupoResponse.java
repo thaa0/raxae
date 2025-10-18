@@ -29,9 +29,19 @@ public class GrupoResponse {
         this.icone = grupo.getIcone();
         this.adminId = grupo.getAdminId();
         this.dataCriacao = grupo.getDataCriacao();
-        this.membros = grupo.getMembros().stream()
-                .map(MembroResponse::new)
-                .collect(Collectors.toSet());
+        converteMembros(grupo);
+
+    }
+
+    private void converteMembros(Grupo grupo) {
+        if (grupo.getMembros() != null){
+            this.membros = grupo.getMembros().stream()
+                    .map(MembroResponse::new)
+                    .collect(Collectors.toSet());
+        }else {
+            this.membros = null;
+        }
+
     }
 
     @Getter
