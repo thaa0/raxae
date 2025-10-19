@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.divertech.raxae.handler.APIException.build;
@@ -90,6 +91,15 @@ public class GrupoController {
         verificaUsuarioAuth(usuarioAtual);
         grupoService.adicionarMembro(idDoGrupo, usuarioAtual);
         log.debug("[finish] GrupoController - geraConvite");
+    }
+
+    @GetMapping("/meus-grupos")
+    public ResponseEntity<List<GrupoResponse>> getGruposPorUsuario(@AuthenticationPrincipal Usuario usuarioAtual) {
+        log.info("[start] GrupoController - getGruposPorUsuario");
+        verificaUsuarioAuth(usuarioAtual);
+        List<GrupoResponse> grupos = grupoService.getGruposPorUsuario(usuarioAtual.getId());
+        log.debug("[finish] GrupoController - getGruposPorUsuario");
+        return ResponseEntity.ok(grupos);
     }
 
     private static void verificaUsuarioAuth(Usuario usuarioAtual) {

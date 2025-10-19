@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -106,6 +107,14 @@ public class GrupoApplicationService implements GrupoService {
         grupo.adicionaNovoMembro(usuarioAtual);
         possuiPermissaoDeAdmin(usuarioAtual.getId(), grupo);
         return baseUrl + idGrupo + "/join";
+    }
+
+    @Override
+    public List<GrupoResponse> getGruposPorUsuario(UUID id) {
+        log.info("[start] GrupoApplicationService - getGruposPorUsuario");
+        List<Grupo> grupos = grupoRepository.buscaGruposPorUsuario(id);
+        log.debug("[finish] GrupoApplicationService - getGruposPorUsuario");
+        return grupos.stream().map(GrupoResponse::new).toList();
     }
 
     private void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {

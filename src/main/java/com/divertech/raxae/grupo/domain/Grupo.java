@@ -89,7 +89,7 @@ public class Grupo {
         Membro novoMembro = Membro.builder()
             .usuario(usuario)
             .grupo(this)
-            .status(StatusParticipacao.PENDENTE)
+            .status(StatusParticipacao.ATIVO)
             .build();
             
         this.membros.add(novoMembro);
