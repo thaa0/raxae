@@ -1,9 +1,10 @@
 package com.divertech.raxae.grupo.application.controller;
 
 import com.divertech.raxae.grupo.domain.StatusParticipacao;
-import com.divertech.raxae.usuario.domain.Usuario;
+import lombok.Getter;
 
+@Getter
 public class MembroResponse {
-    private Usuario usuario;
+    private String nomeCompleto;
     private StatusParticipacao status;
 }
