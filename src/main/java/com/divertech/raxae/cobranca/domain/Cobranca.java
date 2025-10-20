@@ -34,4 +34,15 @@ public class Cobranca {
     private LocalDate dataVencimento;
     private LocalDate dataPagamento;
     private LocalDateTime momentoCriacao;
+
+    
+    public Cobranca(Despesa despesa, Usuario usuario, BigDecimal valor, StatusCobranca status, LocalDate dataVencimento) {
+        this.id = UUID.randomUUID();
+        this.despesa = despesa;
+        this.usuario = usuario;
+        this.valor = valor;
+        this.status = status;
+        this.dataVencimento = dataVencimento;
+        this.momentoCriacao = LocalDateTime.now();
+    }
 }
