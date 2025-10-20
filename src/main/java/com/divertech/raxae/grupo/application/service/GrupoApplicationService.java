@@ -3,6 +3,7 @@ package com.divertech.raxae.grupo.application.service;
 import com.divertech.raxae.grupo.application.controller.GrupoEditaRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
+import com.divertech.raxae.grupo.application.controller.MembroResponse;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
 import com.divertech.raxae.handler.APIException;
@@ -122,6 +123,17 @@ public class GrupoApplicationService implements GrupoService {
         List<Grupo> grupos = grupoRepository.buscaGruposPorUsuario(id);
         log.debug("[finish] GrupoApplicationService - getGruposPorUsuario");
         return grupos.stream().map(GrupoResponse::new).toList();
+    }
+
+    @Override
+    public List<MembroResponse> listarMembro(UUID idDoGrupo) {
+        log.info("[start] GrupoApplicationService - listarMembro");
+        Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
+        List<MembroResponse> lista = grupo.getMembros().stream()
+                .map(membro -> new MembroResponse(membro.getUsuario().getNomeCompleto(), membro.getStatus()))
+                .toList();
+        log.debug("[finish] GrupoApplicationService - listarMembro");
+        return lista;
     }
 
     private void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
