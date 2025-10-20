@@ -5,6 +5,7 @@ import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
 import com.divertech.raxae.usuario.domain.Usuario;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface GrupoService {
@@ -15,4 +16,5 @@ public interface GrupoService {
     void removerMembro(UUID idDoGrupo, UUID idDoMembro, UUID idUsuarioAtual);
     void adicionarMembro(UUID idGrupo, Usuario usuario);
     String geraConvite(UUID idDoGrupo, Usuario usuarioAtual);
+    List<GrupoResponse> getGruposPorUsuario(UUID id);
 }

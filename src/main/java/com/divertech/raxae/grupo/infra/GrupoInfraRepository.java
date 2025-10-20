@@ -3,6 +3,7 @@ package com.divertech.raxae.grupo.infra;
 import com.divertech.raxae.grupo.application.controller.GrupoEditaRequest;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
+import com.divertech.raxae.grupo.domain.StatusParticipacao;
 import com.divertech.raxae.handler.APIException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,5 +55,13 @@ public class GrupoInfraRepository implements GrupoRepository {
         grupo.atualizaInformacoes(grupoEditaRequest);
         grupoSpringDataJPARepository.save(grupo);
         log.debug("[finish] GrupoInfraRepository - editarGrupo");
+    }
+
+    @Override
+    public List<Grupo> buscaGruposPorUsuario(UUID id) {
+        log.info("[start] GrupoInfraRepository - buscaGruposPorUsuario");
+        List<Grupo> grupos = grupoSpringDataJPARepository.findByMembrosUsuarioIdAndMembrosStatus(id, StatusParticipacao.ATIVO);
+        log.debug("[finish] GrupoInfraRepository - buscaGruposPorUsuario");
+        return grupos;
     }
 }
