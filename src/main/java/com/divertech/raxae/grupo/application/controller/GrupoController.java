@@ -102,6 +102,13 @@ public class GrupoController {
         return ResponseEntity.ok(grupos);
     }
 
+    @GetMapping("/{idDoGrupo}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<MembroResponse> listarMembrosPorGrupo(@PathVariable UUID idDoGrupo){
+       log.info("[start] GrupoController - listarMembrosPorGrupo");
+       return grupoService.listarMembro(idDoGrupo);
+    }
+
     private static void verificaUsuarioAuth(Usuario usuarioAtual) {
         if (usuarioAtual == null) {
             throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuario atual não autenticado");

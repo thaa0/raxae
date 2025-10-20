@@ -3,6 +3,7 @@ package com.divertech.raxae.grupo.application.service;
 import com.divertech.raxae.grupo.application.controller.GrupoEditaRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
+import com.divertech.raxae.grupo.application.controller.MembroResponse;
 import com.divertech.raxae.usuario.domain.Usuario;
 
 import java.util.List;
@@ -17,4 +18,5 @@ public interface GrupoService {
     void adicionarMembro(UUID idGrupo, Usuario usuario);
     String geraConvite(UUID idDoGrupo, Usuario usuarioAtual);
     List<GrupoResponse> getGruposPorUsuario(UUID id);
+    List<MembroResponse> listarMembro(UUID idDoGrupo);
 }
