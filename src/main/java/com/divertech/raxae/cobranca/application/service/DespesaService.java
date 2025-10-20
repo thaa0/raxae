@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 import com.divertech.raxae.cobranca.domain.TipoRecorrencia;
 import com.divertech.raxae.cobranca.domain.TipoDivisao;
 import com.divertech.raxae.cobranca.domain.StatusCobranca;
+import com.divertech.raxae.cobranca.application.port.out.NotificacaoServicePort;
+
+import com.divertech.raxae.cobranca.domain.StatusDespesa; 
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class DespesaService {
 
     private final DespesaRepository despesaRepository;
     private final CobrancaRepository cobrancaRepository;
+    private final NotificacaoServicePort notificacaoPort;
 
     @Transactional
     public Despesa registrarDespesa(Grupo grupo, Usuario admin, DespesaRequest request) {
@@ -45,9 +49,33 @@ public class DespesaService {
                 .collect(Collectors.toList());
         List<Cobranca> cobrancas = calcularDivisao(despesaSalva, usuariosDoGrupo, request);
         cobrancaRepository.salvarVarias(cobrancas);
+
+        String mensagem = String.format("Nova despesa '%s' (R$%.2f) no grupo '%s'.",
+                despesa.getNome(), despesa.getValor(), grupo.getNomeGrupo());
+        notificacaoPort.notificarMembros(usuariosDoGrupo, mensagem);
+
         return despesaSalva;
     }
 
+    @Transactional
+    public void cancelarDespesa(Despesa despesa) {
+        List<Cobranca> cobrancas = cobrancaRepository.buscaPorIdDaDespesa(despesa.getId());
+
+        List<Cobranca> cobrancasParaSalvar = new ArrayList<>();
+        for (Cobranca cobranca : cobrancas) {
+            if (cobranca.getStatus() == StatusCobranca.PENDENTE) {
+                cobranca.setStatus(StatusCobranca.CANCELADA);
+                cobrancasParaSalvar.add(cobranca);
+            }
+        }
+
+        if (!cobrancasParaSalvar.isEmpty()) {
+            cobrancaRepository.salvarVarias(cobrancasParaSalvar);
+        }
+
+        despesa.setStatus(StatusDespesa.CANCELADA);
+        despesaRepository.salvar(despesa);
+    }
     private void validarVencimento(DespesaRequest request) {
         if (request.getTipoRecorrencia() == TipoRecorrencia.UNICA) {
             if (request.getDataVencimentoAvulsa() == null) {

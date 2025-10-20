@@ -45,4 +45,8 @@ public class Cobranca {
         this.dataVencimento = dataVencimento;
         this.momentoCriacao = LocalDateTime.now();
     }
+
+    public void setStatus(StatusCobranca status) {
+        this.status = status;
+    }
 }

@@ -24,5 +24,14 @@ public class DespesaController {
             @AuthenticationPrincipal String emailUsuarioLogado) {
         
         return despesaApplicationService.registraDespesa(grupoId, request, emailUsuarioLogado);
+    }    
+    @DeleteMapping("/{despesaId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluirDespesa(
+            @PathVariable UUID grupoId,
+            @PathVariable UUID despesaId,
+            @AuthenticationPrincipal String emailUsuarioLogado) {
+        
+        despesaApplicationService.excluiDespesa(grupoId, despesaId, emailUsuarioLogado);
     }
 }

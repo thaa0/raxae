@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import com.divertech.raxae.cobranca.domain.TipoDivisao;
 import com.divertech.raxae.cobranca.domain.TipoRecorrencia;
+import com.divertech.raxae.cobranca.domain.StatusDespesa;
 
 @Entity
 @Getter
@@ -56,6 +57,10 @@ public class Despesa {
     @Column(nullable = false)
     private LocalDateTime momentoCriacao;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusDespesa status;
+
     public Despesa(Grupo grupo, Usuario criadoPor, DespesaRequest request) {
         this.grupo = grupo;
         this.criadoPor = criadoPor;
@@ -65,11 +70,15 @@ public class Despesa {
         this.tipoRecorrencia = request.getTipoRecorrencia();
         this.pixBeneficiado = request.getPixBeneficiado();
         this.momentoCriacao = LocalDateTime.now();
-
+        this.status = StatusDespesa.ATIVA;
         if (this.tipoRecorrencia == TipoRecorrencia.UNICA) {
             this.dataVencimentoAvulsa = request.getDataVencimentoAvulsa();
         } else {
             this.diaVencimento = request.getDiaVencimento();
         }
+    }
+
+    public void setStatus(StatusDespesa status) {
+        this.status = status;
     }
 }
