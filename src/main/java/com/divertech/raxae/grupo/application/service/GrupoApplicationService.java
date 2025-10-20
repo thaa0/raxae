@@ -35,8 +35,11 @@ public class GrupoApplicationService implements GrupoService {
         Usuario admin = usuarioRepository.buscaUsuarioPorId(usuarioAtual.getId());
         Grupo grupo = new Grupo(grupoRequest);
         grupo.setAdministrador(admin);
-//        grupo.adicionaAdminComoMembro(usuarioAtual);
+        
         grupoRepository.salva(grupo);
+        
+        grupo.adicionaNovoMembro(admin);
+
         log.debug("[finish] GrupoApplicationService - criaGrupo");
         return new GrupoResponse(grupo);
     }
@@ -55,8 +58,6 @@ public class GrupoApplicationService implements GrupoService {
     public GrupoResponse getGrupoById(UUID idDoGrupo, UUID idUsuarioAtual) {
         log.info("[start] GrupoApplicationService - getGrupoById");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
-        //Futuramente, pode-se adicionar uma lógica para verificar
-        // se o usuário atual é membro do grupo antes de retornar os dados.
         return new GrupoResponse(grupo);
     }
 
@@ -67,6 +68,7 @@ public class GrupoApplicationService implements GrupoService {
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
         possuiPermissaoDeAdmin(idUsuarioAtual, grupo);
         grupo.atualizaInformacoes(grupoEditaRequest);
+        
         grupoRepository.salva(grupo);
         log.debug("[finish] GrupoApplicationService - editarGrupo");
     }
@@ -78,7 +80,8 @@ public class GrupoApplicationService implements GrupoService {
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
         possuiPermissaoDeAdmin(idUsuarioAtual, grupo);
         grupo.removeMembro(idDoMembro);
-        grupoRepository.salva(grupo);
+        
+
         log.debug("[finish] GrupoApplicationService - removerMembro");
     }
 
@@ -87,24 +90,28 @@ public class GrupoApplicationService implements GrupoService {
     public void adicionarMembro(UUID idGrupo, Usuario usuario) {
         log.info("[start] GrupoApplicationService - adicionarMembro");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
-        usuarioRepository.buscaUsuarioPorId(usuario.getId());
-        verificaSeMembroJaEstaNoGrupo(usuario,grupo);
+
+        verificaSeMembroJaEstaNoGrupo(usuario, grupo);
+                
+        if (grupo.getAdminId().equals(usuario.getId())) {
+            throw APIException.build(HttpStatus.BAD_REQUEST, "O administrador já é membro do grupo.");
+        }
+
+        
         grupo.adicionaNovoMembro(usuario);
-        grupoRepository.salva(grupo);
+        
         log.info("[finish] GrupoApplicationService - adicionarMembro");
     }
 
     private void verificaSeMembroJaEstaNoGrupo(Usuario usuario, Grupo grupo) {
-        if(grupo.buscaMembro(usuario)!=null){
+        if(grupo.buscaMembro(usuario) != null){
             throw APIException.build(HttpStatus.CONFLICT, "Usuario já esta no grupo!");
         }
-
     }
 
     @Override
     public String geraConvite(UUID idGrupo, Usuario usuarioAtual) {
         Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
-        grupo.adicionaNovoMembro(usuarioAtual);
         possuiPermissaoDeAdmin(usuarioAtual.getId(), grupo);
         return baseUrl + idGrupo + "/join";
     }

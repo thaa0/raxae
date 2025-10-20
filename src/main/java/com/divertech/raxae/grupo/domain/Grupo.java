@@ -80,18 +80,18 @@ public class Grupo {
 
     public void adicionaNovoMembro(Usuario usuario) {
         boolean jaEhMembro = this.membros.stream()
-            .anyMatch(membro -> membro.getUsuario().getId().equals(usuario.getId()));
-            
+                .anyMatch(membro -> membro.getUsuario().getId().equals(usuario.getId()));
+        
         if (jaEhMembro) {
             throw APIException.build(HttpStatus.BAD_REQUEST, "Este usuário já faz parte do grupo.");
         }
         
         Membro novoMembro = Membro.builder()
-            .usuario(usuario)
-            .grupo(this)
-            .status(StatusParticipacao.ATIVO)
-            .build();
-            
+                .usuario(usuario)
+                .grupo(this)
+                .status(StatusParticipacao.ATIVO)
+                .build();
+                
         this.membros.add(novoMembro);
     }
     
@@ -106,6 +106,9 @@ public class Grupo {
     }
 
     public Membro buscaMembro(Usuario usuario) {
-        return this.membros.stream() .filter(membro -> membro.getUsuario().getId().equals(usuario.getId())) .findFirst() .orElse(null);
+        return this.membros.stream()
+                .filter(membro -> membro.getUsuario().getId().equals(usuario.getId()))
+                .findFirst()
+                .orElse(null);
     }
 }
