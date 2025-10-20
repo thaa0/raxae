@@ -5,4 +5,5 @@ import java.util.UUID;
 
 public interface DespesaRepository {
     Despesa salvar(Despesa despesa);
+    Despesa buscaPorId(UUID id);
 }
