@@ -31,4 +31,10 @@ public class Membro {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusParticipacao status;
+
+    public Membro(Usuario usuario, Grupo grupo) {
+        this.usuario = usuario;
+        this.grupo = grupo;
+        this.status = StatusParticipacao.ATIVO;
+    }
 }

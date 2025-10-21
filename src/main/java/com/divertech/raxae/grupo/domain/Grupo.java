@@ -78,23 +78,23 @@ public class Grupo {
         this.membros.removeIf(membro -> membro.getUsuario().getId().equals(idDoMembro));
     }
 
-    public void adicionaNovoMembro(Usuario usuario) {
+    public void adicionaNovoMembro(Membro membro) {
+        if(this.membros==null){
+            this.membros = new HashSet<>();
+        }
+        verificaSeJaEMembro(membro);
+        this.membros.add(membro);
+    }
+
+    private void verificaSeJaEMembro(Membro membro) {
         boolean jaEhMembro = this.membros.stream()
-                .anyMatch(membro -> membro.getUsuario().getId().equals(usuario.getId()));
-        
+                .anyMatch(m -> membro.getUsuario().getId().equals(membro.getId()));
+
         if (jaEhMembro) {
             throw APIException.build(HttpStatus.BAD_REQUEST, "Este usuário já faz parte do grupo.");
         }
-        
-        Membro novoMembro = Membro.builder()
-                .usuario(usuario)
-                .grupo(this)
-                .status(StatusParticipacao.ATIVO)
-                .build();
-                
-        this.membros.add(novoMembro);
     }
-    
+
     public boolean isAdmin(String email) {
         if (this.administrador == null) return false;
         return this.administrador.getEmail().equalsIgnoreCase(email);

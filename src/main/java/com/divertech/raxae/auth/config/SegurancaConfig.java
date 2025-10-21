@@ -30,8 +30,11 @@ public class SegurancaConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/h2-console/**",
+                                "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger/**",
                                 "/v1/auth/cadastro",
                                 "/v1/auth/login"
                         ).permitAll()

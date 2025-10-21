@@ -5,7 +5,10 @@ import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
 import com.divertech.raxae.grupo.application.controller.MembroResponse;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
+import com.divertech.raxae.grupo.application.repository.MembroRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
+import com.divertech.raxae.grupo.domain.Membro;
+import com.divertech.raxae.grupo.domain.StatusParticipacao;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
@@ -25,6 +28,7 @@ import java.util.UUID;
 public class GrupoApplicationService implements GrupoService {
 
     private final GrupoRepository grupoRepository;
+    private final MembroRepository membroRepository;
     private final UsuarioRepository usuarioRepository;
     @Value("${app.base-url:http://localhost:8080/raxae/api/v1/grupo/}")
     private String baseUrl;
@@ -36,11 +40,8 @@ public class GrupoApplicationService implements GrupoService {
         Usuario admin = usuarioRepository.buscaUsuarioPorId(usuarioAtual.getId());
         Grupo grupo = new Grupo(grupoRequest);
         grupo.setAdministrador(admin);
-        
         grupoRepository.salva(grupo);
-        
-        grupo.adicionaNovoMembro(admin);
-
+        adicionarMembro(grupo.getId(), usuarioAtual);
         log.debug("[finish] GrupoApplicationService - criaGrupo");
         return new GrupoResponse(grupo);
     }
@@ -91,21 +92,16 @@ public class GrupoApplicationService implements GrupoService {
     public void adicionarMembro(UUID idGrupo, Usuario usuario) {
         log.info("[start] GrupoApplicationService - adicionarMembro");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
-
-        verificaSeMembroJaEstaNoGrupo(usuario, grupo);
-                
-        if (grupo.getAdminId().equals(usuario.getId())) {
-            throw APIException.build(HttpStatus.BAD_REQUEST, "O administrador já é membro do grupo.");
+        if(grupo.getMembros()!=null){
+            verificaSeMembroJaEstaNoGrupo(usuario, grupo);
         }
-
-        
-        grupo.adicionaNovoMembro(usuario);
-        
+        Membro membro = membroRepository.salva(new Membro(usuario, grupo));
+        grupo.adicionaNovoMembro(membro);
         log.info("[finish] GrupoApplicationService - adicionarMembro");
     }
 
     private void verificaSeMembroJaEstaNoGrupo(Usuario usuario, Grupo grupo) {
-        if(grupo.buscaMembro(usuario) != null){
+        if (grupo.buscaMembro(usuario) != null) {
             throw APIException.build(HttpStatus.CONFLICT, "Usuario já esta no grupo!");
         }
     }
