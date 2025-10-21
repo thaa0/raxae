@@ -1,4 +1,4 @@
-package com.divertech.raxae.notificacao.application.adapter;
+package com.divertech.raxae.notificacao.domain.application.adapter;
 
 import com.divertech.raxae.cobranca.application.port.out.NotificacaoServicePort;
 import com.divertech.raxae.usuario.domain.Usuario;
