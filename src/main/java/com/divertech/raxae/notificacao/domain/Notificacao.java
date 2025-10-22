@@ -26,5 +26,4 @@ public class Notificacao {
     private LocalDateTime dataEnvio;
     @Enumerated(EnumType.STRING)
     private StatusNotificacao statusNotificacao;
-    private LocalDateTime dataLeitura;
 }

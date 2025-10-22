@@ -2,215 +2,64 @@ package com.divertech.raxae.cobranca.application.service;
 
 import com.divertech.raxae.cobranca.application.controller.DespesaRequest;
 import com.divertech.raxae.cobranca.application.controller.DespesaResponse;
-import com.divertech.raxae.cobranca.domain.*;
-import com.divertech.raxae.cobranca.application.port.out.NotificacaoServicePort;
-import com.divertech.raxae.cobranca.repository.CobrancaRepository;
+import com.divertech.raxae.cobranca.domain.Despesa;
+import com.divertech.raxae.cobranca.domain.StatusDespesa;
 import com.divertech.raxae.cobranca.repository.DespesaRepository;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
-import com.divertech.raxae.grupo.domain.Membro;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class DespesaApplicationService implements DespesaService {
 
     private final UsuarioRepository usuarioRepository; 
     private final GrupoRepository grupoRepository;      
     private final DespesaRepository despesaRepository; 
-    private final CobrancaRepository cobrancaRepository;
-    private final NotificacaoServicePort notificacaoPort;
 
     @Override
     @Transactional
     public DespesaResponse registraDespesa(UUID grupoId, DespesaRequest request, String emailUsuarioLogado) {
-        
+        log.info("[start] DespesaApplicationService - registraDespesa");
         Usuario admin = usuarioRepository.buscaUsuarioPorEmail(emailUsuarioLogado);
-        if (admin == null) {
-            throw APIException.build(HttpStatus.NOT_FOUND, "Usuário (admin) não encontrado!");
-        }
-        Grupo grupo = grupoRepository.buscaGrupoPorId(grupoId); 
-        if (grupo == null) {
-            throw APIException.build(HttpStatus.NOT_FOUND, "Grupo não encontrado!");
-        }
-
-        if (!grupo.getAdminId().equals(admin.getId())) { 
-            throw APIException.build(HttpStatus.FORBIDDEN, "Acesso negado: Somente o admin do grupo pode registrar despesas.");
-        }
-
-        validarVencimento(request); 
-        Despesa despesa = new Despesa(grupo, admin, request);
-        Despesa despesaSalva = despesaRepository.salvar(despesa);
-        
-        Set<Membro> membrosDoGrupo = grupo.getMembros(); 
-        List<Usuario> usuariosDoGrupo = membrosDoGrupo.stream()
-                .map(Membro::getUsuario) 
-                .collect(Collectors.toList());
-        
-        List<Cobranca> cobrancas = calcularDivisao(despesaSalva, usuariosDoGrupo, request); 
-        cobrancaRepository.salvarVarias(cobrancas);
-
-        String mensagem = String.format("Nova despesa '%s' (R$%.2f) no grupo '%s'.",
-                despesa.getNome(), despesa.getValor(), grupo.getNomeGrupo());
-        notificacaoPort.notificarMembros(usuariosDoGrupo, mensagem);
-
-        return new DespesaResponse(despesaSalva);
+        Grupo grupo = grupoRepository.buscaGrupoPorId(grupoId);
+        validaPermissao(grupo,admin);
+        log.debug("[finish] DespesaApplicationService - registraDespesa");
+        return new DespesaResponse(despesaRepository.salvar(new Despesa(grupo, admin, request)));
     }
 
     @Override
     @Transactional
     public void excluiDespesa(UUID grupoId, UUID despesaId, String emailUsuarioLogado) {
-        
-        Usuario admin = usuarioRepository.buscaUsuarioPorEmail(emailUsuarioLogado);
-        if (admin == null) { 
-            throw APIException.build(HttpStatus.NOT_FOUND, "Usuário (admin) não encontrado!");
-        }
-        Grupo grupo = grupoRepository.buscaGrupoPorId(grupoId);
-        if (grupo == null) {
-            throw APIException.build(HttpStatus.NOT_FOUND, "Grupo não encontrado!");
-        }
-        Despesa despesa = despesaRepository.buscaPorId(despesaId); 
+        log.info("[start] DespesaApplicationService - excluiDespesa");
+        Despesa despesa = despesaRepository.buscaPorId(despesaId);
+        validaPermissao(grupoRepository.buscaGrupoPorId(grupoId), usuarioRepository.buscaUsuarioPorEmail(emailUsuarioLogado));
+        verificaSeDespesaPertenceAoGrupo(grupoId, despesa);
+        despesa.setStatus(StatusDespesa.CANCELADA);
+        despesaRepository.salvar(despesa);
+        log.debug("[finish] DespesaApplicationService - excluiDespesa");
 
-        if (!grupo.getAdminId().equals(admin.getId())) {
-            throw APIException.build(HttpStatus.FORBIDDEN, "Acesso negado: Somente o admin do grupo pode excluir despesas.");
-        }
+    }
 
+    private static void verificaSeDespesaPertenceAoGrupo(UUID grupoId, Despesa despesa) {
         if (!despesa.getGrupo().getId().equals(grupoId)) {
             throw APIException.build(HttpStatus.FORBIDDEN, "Acesso negado: Despesa não pertence a este grupo.");
         }
-        
-        if (despesa.getStatus() == StatusDespesa.CANCELADA) {
-            throw APIException.build(HttpStatus.BAD_REQUEST, "Esta despesa já está cancelada.");
-        }
-
-        this.cancelarDespesaInterno(despesa);
     }
 
-    @Transactional
-    private void cancelarDespesaInterno(Despesa despesa) {
-        List<Cobranca> cobrancas = cobrancaRepository.buscaPorIdDaDespesa(despesa.getId());
-        List<Cobranca> cobrancasParaSalvar = new ArrayList<>();
-        
-        for (Cobranca cobranca : cobrancas) {
-            if (cobranca.getStatus() == StatusCobranca.PENDENTE) {
-                cobranca.setStatus(StatusCobranca.CANCELADA);
-                cobrancasParaSalvar.add(cobranca);
-            }
-        }
-
-        if (!cobrancasParaSalvar.isEmpty()) {
-            cobrancaRepository.salvarVarias(cobrancasParaSalvar);
-        }
-
-        despesa.setStatus(StatusDespesa.CANCELADA);
-    }
-
-    private void validarVencimento(DespesaRequest request) {
-        if (request.getTipoRecorrencia() == TipoRecorrencia.UNICA) {
-            if (request.getDataVencimentoAvulsa() == null) {
-                throw APIException.build(HttpStatus.BAD_REQUEST, "Para despesas AVULSAS, 'dataVencimentoAvulsa' é obrigatório.");
-            }
-        } else if (request.getTipoRecorrencia() == TipoRecorrencia.MENSAL) {
-            if (request.getDiaVencimento() == null) {
-                throw APIException.build(HttpStatus.BAD_REQUEST, "Para despesas RECORRENTES, 'diaVencimento' é obrigatório.");
-            }
-        }
-    }
-
-    private List<Cobranca> calcularDivisao(Despesa despesa, List<Usuario> usuarios, DespesaRequest request) {
-        List<Cobranca> cobrancas = new ArrayList<>();
-        Map<UUID, Usuario> mapaMembros = usuarios.stream()
-                .collect(Collectors.toMap(Usuario::getId, usuario -> usuario));
-        LocalDate dataVencimento = calcularDataVencimento(despesa);
-        
-        switch (despesa.getTipoDivisao()) {
-            case IGUALITARIA:
-                BigDecimal valorIndividual = despesa.getValor()
-                        .divide(new BigDecimal(usuarios.size()), 2, RoundingMode.HALF_UP);
-                for (Usuario usuario : usuarios) {
-                    cobrancas.add(criarCobranca(despesa, usuario, valorIndividual, dataVencimento));
-                }
-                break;
-            case POR_VALOR:
-                validarDivisaoExata(despesa.getValor(), request.getDivisoesEspecificas());
-                for (Map.Entry<UUID, BigDecimal> entry : request.getDivisoesEspecificas().entrySet()) {
-                    Usuario devedor = mapaMembros.get(entry.getKey());
-                    if (devedor == null) {
-                        throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário com ID " + entry.getKey() + " não pertence a este grupo.");
-                    }
-                    cobrancas.add(criarCobranca(despesa, devedor, entry.getValue(), dataVencimento));
-                }
-                break;
-            case POR_PERCENTUAL:
-                validarDivisaoPorcentagem(request.getDivisoesEspecificas());
-                for (Map.Entry<UUID, BigDecimal> entry : request.getDivisoesEspecificas().entrySet()) {
-                    Usuario devedor = mapaMembros.get(entry.getKey());
-                    if (devedor == null) {
-                        throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário com ID " + entry.getKey() + " não pertence a este grupo.");
-                    }
-                    BigDecimal porcentagem = entry.getValue().divide(new BigDecimal(100));
-                    BigDecimal valorCalculado = despesa.getValor().multiply(porcentagem).setScale(2, RoundingMode.HALF_UP);
-                    cobrancas.add(criarCobranca(despesa, devedor, valorCalculado, dataVencimento));
-                }
-                break;
-        }
-        return cobrancas;
-    }
-
-    private LocalDate calcularDataVencimento(Despesa despesa) {
-        if (despesa.getTipoRecorrencia() == TipoRecorrencia.UNICA) {
-            return despesa.getDataVencimentoAvulsa();
-        } else {
-            LocalDate hoje = LocalDate.now();
-            LocalDate vencimentoEsteMes = hoje.withDayOfMonth(despesa.getDiaVencimento());
-            if (vencimentoEsteMes.isBefore(hoje)) {
-                return vencimentoEsteMes.plusMonths(1);
-            }
-            return vencimentoEsteMes;
-        }
-    }
-
-    private Cobranca criarCobranca(Despesa despesa, Usuario devedor, BigDecimal valor, LocalDate dataVencimento) {
-        return new Cobranca(despesa, devedor, valor, StatusCobranca.PENDENTE, dataVencimento);
-    }
-
-    private void validarDivisaoExata(BigDecimal valorTotal, Map<UUID, BigDecimal> divisoes) {
-        if (divisoes == null || divisoes.isEmpty()) {
-            throw APIException.build(HttpStatus.BAD_REQUEST, "Para divisão por VALOR_EXATO, o mapa 'divisoesEspecificas' é obrigatório.");
-        }
-        BigDecimal soma = divisoes.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-        if (soma.compareTo(valorTotal) != 0) {
-            throw APIException.build(HttpStatus.BAD_REQUEST,
-                    String.format("A soma dos valores (R$%.2f) não bate com o valor total da despesa (R$%.2f).", soma, valorTotal)
-            );
-        }
-    }
-    
-    private void validarDivisaoPorcentagem(Map<UUID, BigDecimal> divisoes) {
-        if (divisoes == null || divisoes.isEmpty()) {
-            throw APIException.build(HttpStatus.BAD_REQUEST, "Para divisão por PORCENTAGEM, o mapa 'divisoesEspecificas' é obrigatório.");
-        }
-        BigDecimal somaPercentual = divisoes.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-        if (somaPercentual.compareTo(new BigDecimal(100)) != 0) {
-            throw APIException.build(HttpStatus.BAD_REQUEST,
-                    String.format("A soma das porcentagens (%.2f%%) não totaliza 100%%.", somaPercentual)
-            );
+    private static void validaPermissao(Grupo grupo, Usuario admin) {
+        if (!grupo.getAdminId().equals(admin.getId())) {
+            throw APIException.build(HttpStatus.FORBIDDEN, "Acesso negado: Somente o admin tem permissão para alteracoes.");
         }
     }
 }
