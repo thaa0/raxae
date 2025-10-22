@@ -70,7 +70,6 @@ public class GrupoApplicationService implements GrupoService {
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
         possuiPermissaoDeAdmin(idUsuarioAtual, grupo);
         grupo.atualizaInformacoes(grupoEditaRequest);
-        
         grupoRepository.salva(grupo);
         log.debug("[finish] GrupoApplicationService - editarGrupo");
     }
@@ -80,10 +79,11 @@ public class GrupoApplicationService implements GrupoService {
     public void removerMembro(UUID idDoGrupo, UUID idDoMembro, UUID idUsuarioAtual) {
         log.info("[start] GrupoApplicationService - removerMembro");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
+        Membro membro = membroRepository.buscaMembro(idDoMembro);
         possuiPermissaoDeAdmin(idUsuarioAtual, grupo);
         grupo.removeMembro(idDoMembro);
-        
-
+        membro.setStatus(StatusParticipacao.REMOVIDO);
+        membroRepository.salva(membro);
         log.debug("[finish] GrupoApplicationService - removerMembro");
     }
 
@@ -97,6 +97,7 @@ public class GrupoApplicationService implements GrupoService {
         }
         Membro membro = membroRepository.salva(new Membro(usuario, grupo));
         grupo.adicionaNovoMembro(membro);
+        grupoRepository.salva(grupo);
         log.info("[finish] GrupoApplicationService - adicionarMembro");
     }
 
