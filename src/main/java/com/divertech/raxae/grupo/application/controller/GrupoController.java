@@ -102,7 +102,7 @@ public class GrupoController {
         return ResponseEntity.ok(grupos);
     }
 
-    @GetMapping("/{idDoGrupo}")
+    @GetMapping("/{idDoGrupo}/membros") // Endpoint já estava em uso.
     @ResponseStatus(HttpStatus.OK)
     public List<MembroResponse> listarMembrosPorGrupo(@PathVariable UUID idDoGrupo){
        log.info("[start] GrupoController - listarMembrosPorGrupo");

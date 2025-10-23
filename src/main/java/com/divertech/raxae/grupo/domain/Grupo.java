@@ -79,13 +79,13 @@ public class Grupo {
     }
 
     public void adicionaNovoMembro(Usuario usuario) {
-        boolean jaEhMembro = this.membros.stream()
-                .anyMatch(membro -> membro.getUsuario().getId().equals(usuario.getId()));
-        
-        if (jaEhMembro) {
-            throw APIException.build(HttpStatus.BAD_REQUEST, "Este usuário já faz parte do grupo.");
+        if(this.membros !   = null){
+            boolean jaEhMembro = this.membros.stream()
+                    .anyMatch(membro -> membro.getUsuario().getId().equals(usuario.getId()));
+            if (jaEhMembro) {
+                throw APIException.build(HttpStatus.BAD_REQUEST, "Este usuário já faz parte do grupo.");
+            }
         }
-        
         Membro novoMembro = Membro.builder()
                 .usuario(usuario)
                 .grupo(this)

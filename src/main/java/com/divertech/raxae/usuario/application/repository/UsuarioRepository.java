@@ -9,4 +9,5 @@ public interface UsuarioRepository {
     Usuario buscaUsuarioPorId(UUID id);
     long count();
     void saveAll(Iterable<Usuario> usuarios);
+    int contaGruposDoUsuario(UUID id);
 }
