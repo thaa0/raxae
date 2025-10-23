@@ -68,10 +68,13 @@ public class FiltroToken extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         return path.contains("/public/") ||
+                path.contains("/v3/api-docs") ||
+                path.contains("/swagger") ||
                 path.contains("/swagger-ui/") ||
                 path.contains("/v1/auth/cadastro") ||
                 path.contains("/v1/auth/login") ||
                 path.contains("/h2-console");
+
     }
 
 }

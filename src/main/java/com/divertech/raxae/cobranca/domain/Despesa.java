@@ -2,6 +2,7 @@ package com.divertech.raxae.cobranca.domain;
 
 import com.divertech.raxae.cobranca.application.controller.DespesaRequest;
 import com.divertech.raxae.grupo.domain.Grupo;
+import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.domain.Usuario;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -16,6 +17,7 @@ import java.util.UUID;
 import com.divertech.raxae.cobranca.domain.TipoDivisao;
 import com.divertech.raxae.cobranca.domain.TipoRecorrencia;
 import com.divertech.raxae.cobranca.domain.StatusDespesa;
+import org.springframework.http.HttpStatus;
 
 @Entity
 @Getter
@@ -41,8 +43,6 @@ public class Despesa {
     private BigDecimal valor;
 
     private Integer diaVencimento;
-
-    private LocalDate dataVencimentoAvulsa;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -71,14 +71,13 @@ public class Despesa {
         this.pixBeneficiado = request.getPixBeneficiado();
         this.momentoCriacao = LocalDateTime.now();
         this.status = StatusDespesa.ATIVA;
-        if (this.tipoRecorrencia == TipoRecorrencia.UNICA) {
-            this.dataVencimentoAvulsa = request.getDataVencimentoAvulsa();
-        } else {
-            this.diaVencimento = request.getDiaVencimento();
-        }
     }
 
     public void setStatus(StatusDespesa status) {
+        if (this.status == status) {
+            String msgErro = String.format("Esta despesa já está {}", status);
+            throw APIException.build(HttpStatus.CONFLICT,msgErro);
+        }
         this.status = status;
     }
 }
