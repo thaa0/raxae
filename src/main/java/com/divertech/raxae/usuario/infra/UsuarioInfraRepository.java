@@ -1,5 +1,7 @@
 package com.divertech.raxae.usuario.infra;
 
+import com.divertech.raxae.grupo.application.repository.GrupoRepository;
+import com.divertech.raxae.grupo.infra.GrupoSpringDataJPARepository;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
@@ -15,6 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UsuarioInfraRepository implements UsuarioRepository {
     private final UsuarioSpringDataJpaRepository usuarioSpringDataRepository;
+    private final GrupoRepository grupoRepository;
 
     @Override
     public void salva(Usuario usuario) {
@@ -54,5 +57,13 @@ public class UsuarioInfraRepository implements UsuarioRepository {
         log.info("[start] UsuarioInfraRepository - saveAll");
         usuarioSpringDataRepository.saveAll(usuarios);
         log.info("[finish] UsuarioInfraRepository - saveAll");
+    }
+
+    @Override
+    public int contaGruposDoUsuario(UUID id) {
+        log.info("[start] UsuarioInfraRepository - contaGruposDoUsuario");
+        int numeroDeGrupos = grupoRepository.buscaGruposPorUsuario(id).size();
+        log.info("[finish] UsuarioInfraRepository - contaGruposDoUsuario");
+        return numeroDeGrupos;
     }
 }
