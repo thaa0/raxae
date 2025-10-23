@@ -37,8 +37,6 @@ public class UsuarioController {
         return tokenResponse;
     }
 
-    //Get - Ver info por usuário, deve retornar InfoUsuarioResponse - Deve puxar as infos com base no usuário que está fazendo a requisição (token), os campos double EconomiaTotal;
-    //    double totalPagoNoMes devem ser mockados, use variáveis enquanto nao temos os metodos prontos.
     @GetMapping("/info")
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseEntity<InfoUsuarioResponse> getInfoUsuario(@AuthenticationPrincipal Usuario usuarioLogado) {

@@ -30,16 +30,16 @@ public class UsuarioApplicationService implements UsuarioService {
     @Override
     public InfoUsuarioResponse getInfoUsuario(Usuario usuarioLogado) {
         log.info("[start] UsuarioApplicationService - getInfoUsuario");
-        // Mocked values for EconomiaTotal and totalPagoNoMes
-        double economiaTotal = 1500.00; // Example mocked value
-        double totalPagoNoMes = 300.00; // Example mocked value
-        //int numeroDeGrupos deve ser buscado no repository. A tabela membro tem a relação dos usuários com os grupos.
+        double economiaTotal = 1500.00; // Mockado
+        double totalPagoNoMes = 300.00; // Mockado
         int numeroDeGrupos = usuarioRepository.contaGruposDoUsuario(usuarioLogado.getId());
+        log.debug("DEBUG: Número de grupos do usuário: {}", numeroDeGrupos);
         InfoUsuarioResponse infoUsuarioResponse = new InfoUsuarioResponse(
                 numeroDeGrupos,
                 economiaTotal,
                 totalPagoNoMes
         );
+        log.debug("DEBUG: Economia total: {}, Total pago no mês: {}", economiaTotal, totalPagoNoMes);
         log.debug("[finish] UsuarioApplicationService - getInfoUsuario");
         return infoUsuarioResponse;
     }
