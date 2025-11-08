@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import java.util.Map;
 
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -14,4 +15,7 @@ public class ErrorApiResponse {
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private String description;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, String> details;
 }
