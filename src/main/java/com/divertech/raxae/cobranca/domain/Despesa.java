@@ -1,23 +1,22 @@
 package com.divertech.raxae.cobranca.domain;
 
 import com.divertech.raxae.cobranca.application.controller.DespesaRequest;
+import com.divertech.raxae.cobranca.application.controller.DivisaoRequest;
 import com.divertech.raxae.grupo.domain.Grupo;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.domain.Usuario;
+import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-
-import com.divertech.raxae.cobranca.domain.TipoDivisao;
-import com.divertech.raxae.cobranca.domain.TipoRecorrencia;
-import com.divertech.raxae.cobranca.domain.StatusDespesa;
-import org.springframework.http.HttpStatus;
 
 @Entity
 @Getter
@@ -61,6 +60,12 @@ public class Despesa {
     @Column(nullable = false)
     private StatusDespesa status;
 
+    private int dataVencimentoAvulsa;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "despesa_id", referencedColumnName = "id", nullable = false)
+    private List<DespesaDivisaoPersonalizada> divisoesPersonalizadas = new ArrayList<>();
+
     public Despesa(Grupo grupo, Usuario criadoPor, DespesaRequest request) {
         this.grupo = grupo;
         this.criadoPor = criadoPor;
@@ -75,8 +80,8 @@ public class Despesa {
 
     public void setStatus(StatusDespesa status) {
         if (this.status == status) {
-            String msgErro = String.format("Esta despesa já está {}", status);
-            throw APIException.build(HttpStatus.CONFLICT,msgErro);
+            String msgErro = String.format("Esta despesa já está %s", status);
+            throw APIException.build(HttpStatus.CONFLICT, msgErro);
         }
         this.status = status;
     }
