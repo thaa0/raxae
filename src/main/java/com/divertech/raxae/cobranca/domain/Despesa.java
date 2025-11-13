@@ -60,6 +60,8 @@ public class Despesa {
     @Column(nullable = false)
     private StatusDespesa status;
 
+    private int dataVencimentoAvulsa;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "despesa_id", referencedColumnName = "id", nullable = false)
     private List<DespesaDivisaoPersonalizada> divisoesPersonalizadas = new ArrayList<>();
@@ -82,65 +84,5 @@ public class Despesa {
             throw APIException.build(HttpStatus.CONFLICT, msgErro);
         }
         this.status = status;
-    }
-
-    public void processarDivisoes(List<DivisaoRequest> divisoesRequest, UsuarioRepository usuarioRepository) {
-        this.divisoesPersonalizadas.clear();
-
-        if (this.tipoDivisao == TipoDivisao.IGUALITARIA) {
-            return;
-        }
-
-        if (divisoesRequest == null || divisoesRequest.isEmpty()) {
-            throw APIException.build(HttpStatus.BAD_REQUEST, "Lista de divisões vazia");
-        }
-
-        BigDecimal somaValores = BigDecimal.ZERO;
-        BigDecimal somaPercentuais = BigDecimal.ZERO;
-
-        for (DivisaoRequest req : divisoesRequest) {
-            if (req == null || req.getUsuarioId() == null) {
-                throw APIException.build(HttpStatus.BAD_REQUEST, "Divisão inválida: usuário obrigatório");
-            }
-
-            Usuario membro = usuarioRepository.buscaUsuarioPorId(req.getUsuarioId());
-
-            BigDecimal valorReq = req.getValor();
-            BigDecimal percentualReq = req.getPercentual();
-
-            if (this.tipoDivisao == TipoDivisao.POR_VALOR) {
-                if (valorReq == null || valorReq.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw APIException.build(HttpStatus.BAD_REQUEST, "Valor obrigatório e maior que zero para divisão por valor");
-                }
-                somaValores = somaValores.add(valorReq);
-            } else if (this.tipoDivisao == TipoDivisao.POR_PERCENTUAL) {
-                if (percentualReq == null || percentualReq.compareTo(BigDecimal.ZERO) <= 0) {
-                    throw APIException.build(HttpStatus.BAD_REQUEST, "Percentual obrigatório e maior que zero para divisão por percentual");
-                }
-                somaPercentuais = somaPercentuais.add(percentualReq);
-            } else {
-                throw APIException.build(HttpStatus.BAD_REQUEST, "Tipo de divisão inválido");
-            }
-
-            DespesaDivisaoPersonalizada divisao = new DespesaDivisaoPersonalizada(
-                    this,
-                    membro,
-                    valorReq,
-                    percentualReq,
-                    this.tipoDivisao
-            );
-
-            this.divisoesPersonalizadas.add(divisao);
-        }
-
-        if (this.tipoDivisao == TipoDivisao.POR_VALOR) {
-            if (somaValores.compareTo(this.valor) != 0) {
-                throw APIException.build(HttpStatus.BAD_REQUEST, "A soma dos valores personalizados deve ser igual ao valor da despesa");
-            }
-        } else if (this.tipoDivisao == TipoDivisao.POR_PERCENTUAL) {
-            if (somaPercentuais.compareTo(new BigDecimal("100")) != 0) {
-                throw APIException.build(HttpStatus.BAD_REQUEST, "A soma dos percentuais personalizados deve ser igual a 100");
-            }
-        }
     }
 }

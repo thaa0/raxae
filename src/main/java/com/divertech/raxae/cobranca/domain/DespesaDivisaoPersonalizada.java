@@ -41,9 +41,6 @@ public class DespesaDivisaoPersonalizada {
         if (tipoDivisao == TipoDivisao.POR_VALOR) {
             this.valorPersonalizado = valor;
             this.percentualPersonalizado = null;
-        } else if (tipoDivisao == TipoDivisao.POR_PERCENTUAL) {
-            this.valorPersonalizado = null;
-            this.percentualPersonalizado = percentual;
         }
     }
 }
