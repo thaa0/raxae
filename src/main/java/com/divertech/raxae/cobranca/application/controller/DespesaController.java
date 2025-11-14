@@ -1,6 +1,7 @@
 package com.divertech.raxae.cobranca.application.controller;
 
 import com.divertech.raxae.cobranca.application.service.DespesaService;
+import com.divertech.raxae.usuario.domain.Usuario;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,9 +22,9 @@ public class DespesaController {
     public DespesaResponse registrarDespesa(
             @PathVariable UUID grupoId,
             @Valid @RequestBody DespesaRequest request,
-            @AuthenticationPrincipal String emailUsuarioLogado) {
+            @AuthenticationPrincipal Usuario usuarioAtual) {
         
-        return despesaService.registraDespesa(grupoId, request, emailUsuarioLogado);
+        return despesaService.registraDespesa(grupoId, request, usuarioAtual.getEmail());
     }
     
     @DeleteMapping("/{despesaId}")
