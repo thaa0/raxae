@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,8 @@ public class DespesaInfraRepository implements DespesaRepository {
 
     @Override
     public List<Despesa> buscarPorDiaVencimentoEStatus(Integer diaVencimento, StatusDespesa status) {
-        return jpaRepository.findByDiaVencimentoAndStatus(diaVencimento, status);
+        // Busca despesas desde hoje até o dia alvo
+        Integer diaHoje = LocalDate.now().getDayOfMonth();
+        return jpaRepository.findByDiaVencimentoBetweenAndStatus(diaHoje, diaVencimento, status);
     }
 }
