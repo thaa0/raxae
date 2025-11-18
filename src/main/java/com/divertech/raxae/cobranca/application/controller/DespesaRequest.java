@@ -26,9 +26,6 @@ public class DespesaRequest {
     @NotNull(message = "Tipo de divisão é obrigatório")
     private TipoDivisao tipoDivisao;
 
-    @FutureOrPresent(message = "Data de vencimento (avulsa) não pode ser no passado.")
-    private LocalDate dataVencimentoAvulsa;
-
     @Min(value = 1, message = "O dia de vencimento deve ser entre 1 e 31.")
     @Max(value = 31, message = "O dia de vencimento deve ser entre 1 e 31.")
     private Integer diaVencimento;

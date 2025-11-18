@@ -60,7 +60,6 @@ public class Despesa {
     @Column(nullable = false)
     private StatusDespesa status;
 
-    private int dataVencimentoAvulsa;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "despesa_id", referencedColumnName = "id", nullable = false)
@@ -76,6 +75,7 @@ public class Despesa {
         this.pixBeneficiado = request.getPixBeneficiado();
         this.momentoCriacao = LocalDateTime.now();
         this.status = StatusDespesa.ATIVA;
+        this.diaVencimento = request.getDiaVencimento();
     }
 
     public void setStatus(StatusDespesa status) {
