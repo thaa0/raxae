@@ -22,4 +22,8 @@ public class CobrancaInfraRepository implements CobrancaRepository {
     public List<Cobranca> buscaPorIdDaDespesa(UUID despesaId) {
         return jpaRepository.findByDespesaId(despesaId);
     }
+    @Override
+    public boolean existeCobrancaParaDespesaEMes(UUID despesaId, String mesReferencia) {
+        return jpaRepository.existsByDespesaIdAndMesReferencia(despesaId, mesReferencia);
+    }
 }

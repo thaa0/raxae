@@ -7,5 +7,5 @@ import java.util.UUID;
 public interface CobrancaRepository {
     List<Cobranca> salvarVarias(List<Cobranca> cobrancas);
     List<Cobranca> buscaPorIdDaDespesa(UUID despesaId);
-    
+    boolean existeCobrancaParaDespesaEMes(UUID despesaId, String mesReferencia);
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.UUID;
 
 @Entity
@@ -34,6 +35,8 @@ public class Cobranca {
     private LocalDate dataVencimento;
     private LocalDate dataPagamento;
     private LocalDateTime momentoCriacao;
+    @Column(nullable = false, length = 7)
+    private String mesReferencia; // Formato: YYYY-MM (ex: "2025-11")
 
     
     public Cobranca(Despesa despesa, Usuario usuario, BigDecimal valor, StatusCobranca status, LocalDate dataVencimento) {
@@ -44,6 +47,7 @@ public class Cobranca {
         this.status = status;
         this.dataVencimento = dataVencimento;
         this.momentoCriacao = LocalDateTime.now();
+        this.mesReferencia = YearMonth.from(dataVencimento).toString();
     }
 
     public void setStatus(StatusCobranca status) {

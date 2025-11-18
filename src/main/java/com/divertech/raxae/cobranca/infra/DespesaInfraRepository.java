@@ -1,12 +1,14 @@
 package com.divertech.raxae.cobranca.infra;
 
 import com.divertech.raxae.cobranca.domain.Despesa;
+import com.divertech.raxae.cobranca.domain.StatusDespesa;
 import com.divertech.raxae.cobranca.repository.DespesaRepository;
 import com.divertech.raxae.handler.APIException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -26,4 +28,8 @@ public class DespesaInfraRepository implements DespesaRepository {
                 .orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Despesa não encontrada!"));
     }
 
+    @Override
+    public List<Despesa> buscarPorDiaVencimentoEStatus(Integer diaVencimento, StatusDespesa status) {
+        return jpaRepository.findByDiaVencimentoAndStatus(diaVencimento, status);
+    }
 }
