@@ -1,5 +1,6 @@
-package com.divertech.raxae.notificacao.application.service;
+package com.divertech.raxae.notificacao.scheduller;
 
+import com.divertech.raxae.notificacao.application.service.GeracaoLembreteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
