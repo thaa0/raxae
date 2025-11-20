@@ -29,3 +29,9 @@ raxae:
   jwt:
     expiracao: 43200000
     chave: m7UoDqT1UjKg0mPVv8WrBpdFjM9iM0Jr9N9Z4VbVXZl4r7y3hwc5v1bOq/MLjW7W9RhtFJvFsBLOdN0bY9VYhw==
+
+maytapi:
+  base-url: ${BASE_URL_MAYTAPI:https://api.maytapi.com}
+  api-key: ${API_KEY_MAYTAPI:pdFjM9iM0Jr9N9Z4VbVXZl4r7y3hwc5v1bOq/M}
+  phone-id: ${PHONE_ID_MAYTAPI:c089-83e3-42e1-909e-c7}
+  product-id: ${PRODUCT_ID_MAYTAPI:f74493e0-291c-48e4}

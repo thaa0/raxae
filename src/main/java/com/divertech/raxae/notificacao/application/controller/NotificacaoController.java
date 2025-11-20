@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/lembretes")
 @RequiredArgsConstructor
 @Tag(name = "Lembretes", description = "Endpoints relacionados a lembretes de cobrança via WhatsApp")
-public class LembreteController {
+public class NotificacaoController {
 
     private final GeracaoLembreteService geracaoLembreteService;
 

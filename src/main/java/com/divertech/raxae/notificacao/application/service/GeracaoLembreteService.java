@@ -36,7 +36,6 @@ public class GeracaoLembreteService {
     public int processarLembretesVenceDaqui2Dias() {
         LocalDate daquiDoisDias = LocalDate.now().plusDays(2);
         log.info("Processando lembretes: Vence Daqui 2 Dias ({})", daquiDoisDias);
-
         List<Cobranca> cobrancas = buscarCobrancasPendentes(daquiDoisDias);
         log.info("Encontradas {} cobranças que vencem daqui 2 dias", cobrancas.size());
 
@@ -63,7 +62,6 @@ public class GeracaoLembreteService {
                         cobranca.getId(), e.getMessage(), e);
             }
         }
-
         log.info("Lembretes 'Vence Daqui 2 Dias' enviados: {}/{}", sucessos, cobrancas.size());
         return sucessos;
     }
@@ -88,7 +86,7 @@ public class GeracaoLembreteService {
                         nomeDespesa,
                         nomeUsuario
                 );
-
+                log.info(cobranca.getDespesa().getNome() + " - " + mensagem);
                 boolean enviado = whatsAppService.enviarMensagem(numeroWhatsApp, mensagem);
                 if (enviado) {
                     sucessos++;
@@ -125,11 +123,11 @@ public class GeracaoLembreteService {
                         nomeUsuario
                 );
 
+                log.info(cobranca.getDespesa().getNome() + " - " + mensagem);
                 boolean enviado = whatsAppService.enviarMensagem(numeroWhatsApp, mensagem);
                 if (enviado) {
                     sucessos++;
                 }
-
             } catch (Exception e) {
                 log.error("Erro ao processar lembrete vence hoje para cobrança {}: {}",
                         cobranca.getId(), e.getMessage(), e);
@@ -142,12 +140,8 @@ public class GeracaoLembreteService {
 
 
     public void executarGeracaoLembretes() {
-        log.info("========================================");
         log.info("=== Iniciando Geração de Lembretes Automáticos ===");
-        log.info("========================================");
-
         int totalEnviados = 0;
-
         try {
             // Janela 1: Vence daqui 2 dias
             int venceDaqui2Dias = processarLembretesVenceDaqui2Dias();
@@ -167,10 +161,8 @@ public class GeracaoLembreteService {
             log.info("Lembretes 'Vence Amanhã': {}", venceAmanha);
             log.info("Lembretes 'Vence Hoje': {}", venceHoje);
             log.info("Total de lembretes enviados: {}", totalEnviados);
-            log.info("========================================");
-
         } catch (Exception e) {
-            log.error("Erro durante execução da geração de lembretes", e);
+            log.error("[error] Erro durante execução da geração de lembretes", e);
         }
     }
 
