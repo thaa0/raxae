@@ -295,36 +295,9 @@ Os tokens expiram após 12 horas (43200000 ms). Faça login novamente para obter
 
 ---
 
-## 👨‍💻 Desenvolvimento
-
-### Compilar sem executar testes
-
-```cmd
-mvnw.cmd clean install -DskipTests
-```
-
-### Executar em modo debug
-
-```cmd
-mvnw.cmd spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
-```
-
----
-
 ## 📝 Licença
 
 Este projeto foi desenvolvido para fins acadêmicos.
-
----
-
-## 📞 Suporte
-
-Para dúvidas ou problemas, consulte a documentação do Swagger ou verifique os logs da aplicação.
-
-**Logs importantes:**
-- Geração de cobranças: `[GeracaoAutomaticaCobrancaService]`
-- Envio de lembretes: `[GeracaoLembreteService]`
-- Autenticação: `[AuthService]`
 
 ---
 
