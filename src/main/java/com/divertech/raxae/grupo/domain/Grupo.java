@@ -52,7 +52,8 @@ public class Grupo {
     private List<Despesa> despesas = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "grupo_id")
     private Set<Membro> membros = new HashSet<>();
 
     public Grupo(GrupoNovoRequest grupoRequest) {
@@ -79,7 +80,7 @@ public class Grupo {
     }
 
     public void adicionaNovoMembro(Membro membro) {
-        if(this.membros==null){
+        if(this.membros==null || this.membros.isEmpty()){
             this.membros = new HashSet<>();
         }
         verificaSeJaEMembro(membro);
@@ -88,7 +89,7 @@ public class Grupo {
 
     private void verificaSeJaEMembro(Membro membro) {
         boolean jaEhMembro = this.membros.stream()
-                .anyMatch(m -> membro.getUsuario().getId().equals(membro.getId()));
+                .anyMatch(m -> m.getUsuario().getId().equals(membro.getUsuario().getId()));
 
         if (jaEhMembro) {
             throw APIException.build(HttpStatus.BAD_REQUEST, "Este usuário já faz parte do grupo.");

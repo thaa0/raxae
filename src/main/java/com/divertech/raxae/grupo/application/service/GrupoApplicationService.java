@@ -95,7 +95,7 @@ public class GrupoApplicationService implements GrupoService {
         if(grupo.getMembros()!=null){
             verificaSeMembroJaEstaNoGrupo(usuario, grupo);
         }
-        Membro membro = membroRepository.salva(new Membro(usuario, grupo));
+        Membro membro = membroRepository.salva(new Membro(usuario));
         grupo.adicionaNovoMembro(membro);
         grupoRepository.salva(grupo);
         log.info("[finish] GrupoApplicationService - adicionarMembro");

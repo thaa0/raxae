@@ -33,21 +33,9 @@ public class CobrancaApplicationService implements CobrancaService {
 //                    cobrancas.add(criarCobranca(despesa, devedor, entry.getValue(), dataVencimento));
 //                }
 //                break;
-//            case POR_PERCENTUAL:
-//                validarDivisaoPorcentagem(request.getDivisoesEspecificas());
-//                for (Map.Entry<UUID, BigDecimal> entry : request.getDivisoesEspecificas().entrySet()) {
-//                    Usuario devedor = mapaMembros.get(entry.getKey());
-//                    if (devedor == null) {
-//                        throw APIException.build(HttpStatus.BAD_REQUEST, "Usuário com ID " + entry.getKey() + " não pertence a este grupo.");
-//                    }
-//                    BigDecimal porcentagem = entry.getValue().divide(new BigDecimal(100));
-//                    BigDecimal valorCalculado = despesa.getValor().multiply(porcentagem).setScale(2, RoundingMode.HALF_UP);
-//                    cobrancas.add(criarCobranca(despesa, devedor, valorCalculado, dataVencimento));
-//                }
-//                break;
-//        }
-//        return cobrancas;
-//    }
+//          }
+//          return cobrancas;
+//      }
 //
 //
 //
