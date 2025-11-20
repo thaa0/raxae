@@ -125,8 +125,10 @@ public class GeracaoAutomaticaCobrancaService {
 
         // Passo 1: Calcular dia-alvo (data atual + 3 dias)
         int diaAlvo = calcularDiaAlvo();
-        LocalDate dataVencimento = LocalDate.now().plusDays(3);
-        String mesReferencia = YearMonth.from(dataVencimento).toString();
+
+        // Calcular ano e mês atual para a data de vencimento
+        YearMonth mesAtual = YearMonth.now();
+        String mesReferencia = mesAtual.toString();
 
         log.info("Dia alvo: {} - Mês de referência: {}", diaAlvo, mesReferencia);
 
@@ -136,7 +138,6 @@ public class GeracaoAutomaticaCobrancaService {
 
         int despesasProcessadas = 0;
         int despesasIgnoradas = 0;
-        int cobrancasGeradas = 0;
 
         for (Despesa despesa : despesas) {
             try {
@@ -145,10 +146,15 @@ public class GeracaoAutomaticaCobrancaService {
                     despesasIgnoradas++;
                     continue;
                 }
+                if(despesa.getTipoRecorrencia() != TipoRecorrencia.UNICA){
+                    // Calcular data de vencimento: dia da despesa no mês/ano atual
+                    int diaVencimento = despesa.getDiaVencimento();
+                    LocalDate dataVencimento = mesAtual.atDay(Math.min(diaVencimento, mesAtual.lengthOfMonth()));
 
-                // Passo 4: Gerar cobranças
-                gerarCobrancasParaDespesa(despesa, dataVencimento);
-                despesasProcessadas++;
+                    // Passo 4: Gerar cobranças
+                    gerarCobrancasParaDespesa(despesa, dataVencimento);
+                    despesasProcessadas++;
+                }
 
             } catch (Exception e) {
                 log.error("Erro ao processar despesa {}: {}", despesa.getNome(), e.getMessage(), e);
