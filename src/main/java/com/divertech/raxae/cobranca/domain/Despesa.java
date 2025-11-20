@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -60,10 +61,11 @@ public class Despesa {
     @Column(nullable = false)
     private StatusDespesa status;
 
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "despesa_id", referencedColumnName = "id", nullable = false)
-    private List<DespesaDivisaoPersonalizada> divisoesPersonalizadas = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "despesa_divisoes_especificas", joinColumns = @JoinColumn(name = "despesa_id"))
+    @MapKeyColumn(name = "usuario_id")
+    @Column(name = "valor", precision = 10, scale = 2)
+    private Map<UUID, BigDecimal> divisoesEspecificas;
 
     public Despesa(Grupo grupo, Usuario criadoPor, DespesaRequest request) {
         this.grupo = grupo;
@@ -76,6 +78,7 @@ public class Despesa {
         this.momentoCriacao = LocalDateTime.now();
         this.status = StatusDespesa.ATIVA;
         this.diaVencimento = request.getDiaVencimento();
+        this.divisoesEspecificas = request.getDivisoesEspecificas();
     }
 
     public void setStatus(StatusDespesa status) {

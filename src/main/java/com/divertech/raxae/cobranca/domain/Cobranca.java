@@ -2,10 +2,7 @@ package com.divertech.raxae.cobranca.domain;
 
 import com.divertech.raxae.usuario.domain.Usuario;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,6 +27,7 @@ public class Cobranca {
     private Usuario usuario;
     @Column(precision = 10, scale = 2)
     private BigDecimal valor;
+    @Setter
     @Enumerated(EnumType.STRING)
     private StatusCobranca status;
     private LocalDate dataVencimento;
@@ -40,7 +38,6 @@ public class Cobranca {
 
     
     public Cobranca(Despesa despesa, Usuario usuario, BigDecimal valor, StatusCobranca status, LocalDate dataVencimento) {
-        this.id = UUID.randomUUID();
         this.despesa = despesa;
         this.usuario = usuario;
         this.valor = valor;
@@ -50,7 +47,4 @@ public class Cobranca {
         this.mesReferencia = YearMonth.from(dataVencimento).toString();
     }
 
-    public void setStatus(StatusCobranca status) {
-        this.status = status;
-    }
 }

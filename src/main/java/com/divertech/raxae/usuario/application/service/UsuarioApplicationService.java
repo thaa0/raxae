@@ -31,17 +31,13 @@ public class UsuarioApplicationService implements UsuarioService {
     @Transactional 
     public void cadastrarUsuario(UsuarioRequest request) {
         log.info("[start] UsuarioApplicationService - cadastrarUsuario");
-        
         Usuario novoUsuario = new Usuario(request, encriptador);
         usuarioRepository.salva(novoUsuario);
-        
-    
         try {
-            Plano planoGratuito = planoRepository.buscaPorTipo(TipoPlano.GRATUITO);
-            Adesao novaAdesao = Adesao.criarAdesaoInicial(novoUsuario, planoGratuito);
-            adesaoRepository.salvar(novaAdesao);
+//            Plano planoGratuito = planoRepository.buscaPorTipo(TipoPlano.GRATUITO);
+//            Adesao novaAdesao = Adesao.criarAdesaoInicial(novoUsuario, planoGratuito);
+//            adesaoRepository.salvar(novaAdesao);
         } catch (Exception e) {
-    
             log.error("[fail] Falha ao criar adesão padrão para o usuário {}", request.getEmail(), e);
             throw new RuntimeException("Falha ao finalizar cadastro. Tente novamente.", e);
         }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,17 +86,16 @@ public class GeracaoAutomaticaCobrancaService {
             }
         } else if (despesa.getTipoDivisao() == TipoDivisao.POR_VALOR) {
             // Divisão personalizada por valor
-            Map<Usuario, BigDecimal> divisaoPersonalizada = despesa.getDivisoesPersonalizadas().stream()
-                    .collect(Collectors.toMap(
-                            DespesaDivisaoPersonalizada::getUsuario,
-                            DespesaDivisaoPersonalizada::getValorPersonalizado
-                    ));
+            Map<UUID, BigDecimal> divisoesEspecificas = despesa.getDivisoesEspecificas();
+
+            if (divisoesEspecificas == null || divisoesEspecificas.isEmpty()) {
+                log.warn("Despesa {} é do tipo POR_VALOR mas não possui divisões específicas definidas", despesa.getNome());
+                throw APIException.build(HttpStatus.BAD_REQUEST, "Divisões específicas não definidas para despesa do tipo POR_VALOR");
+            }
 
             for (Membro membro : membrosAtivos) {
-                BigDecimal valorMembro = divisaoPersonalizada.getOrDefault(
-                        membro.getUsuario(),
-                        BigDecimal.ZERO
-                );
+                UUID usuarioId = membro.getId();
+                BigDecimal valorMembro = divisoesEspecificas.getOrDefault(usuarioId, BigDecimal.ZERO);
 
                 if (valorMembro.compareTo(BigDecimal.ZERO) > 0) {
                     Cobranca cobranca = new Cobranca(
@@ -160,4 +160,3 @@ public class GeracaoAutomaticaCobrancaService {
         log.info("=====================================");
     }
 }
-
