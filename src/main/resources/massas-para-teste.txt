@@ -1,0 +1,115 @@
+Massas para teste
+
+Usuario 1
+
+{
+  "nomeCompleto": "Thálita Souza",
+  "whatsapp": "73988805160",
+  "email": "thalita@gmail.com",
+  "senha": "1234"
+}
+{
+  "tipo": "Bearer",
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBUEkgUmF4YWUiLCJzdWIiOiJ0aGFsaXRhQGdtYWlsLmNvbSIsIm5vbWVDb21wbGV0byI6IlRow6FsaXRhIFNvdXphIiwiaWF0IjoxNzYzNjU4MzczLCJleHAiOjE3NjM3MDE1NzN9.r_W-Uo77IpcgqmAtJrI0EA39jdfj0GQUv0Er6FnF1YI",
+  "usuarioId": "2bb53f34-8358-4b14-bf71-2c3af08adfc6"
+}
+
+Usuario 2
+
+{
+  "nomeCompleto": "Rick Lee",
+  "whatsapp": "73988805180",
+  "email": "ricklee@gmail.com",
+  "senha": "1234"
+}
+{
+  "tipo": "Bearer",
+  "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBUEkgUmF4YWUiLCJzdWIiOiJyaWNrbGVlQGdtYWlsLmNvbSIsIm5vbWVDb21wbGV0byI6IlJpY2sgTGVlIiwiaWF0IjoxNzYzNjU4NTA4LCJleHAiOjE3NjM3MDE3MDh9.GhXEWZ_EnqW_B2pwaRYANzA9EY9_nVuzgPgSocQVGL8",
+  "usuarioId": "eecc20a3-23cb-462c-ace8-aa0925e55cd8"
+}
+============================================================================================
+Grupo 1 - adm: Rick Lee
+{
+  "id": "ba595d4b-794b-40fc-87b7-2d612ab59031",
+  "nomeGrupo": "ADS",
+  "descricao": "Cursos compartilhados para hora complementar",
+  "icone": "string",
+  "adminId": "9471f713-9335-4647-ac5f-8ff336f4bad6",
+  "dataCriacao": "2025-11-20T15:12:54.6286435",
+  "membros": [
+    {
+      "idMembro": "95e4b9ff-bb75-4f12-ab67-d7ea449a248d",
+      "idUsuario": "9471f713-9335-4647-ac5f-8ff336f4bad6",
+      "nomeUsuario": "Rick Lee",
+      "status": "ATIVO"
+    }
+  ]
+}
+despesas:
+{
+  "id": "49920820-b245-49ed-9ddf-d164cf7dc3ab",
+  "nome": "rocktseat",
+  "valor": 245,
+  "tipoRecorrencia": "MENSAL",
+  "tipoDivisao": "IGUALITARIA",
+  "momentoCriacao": "2025-11-20T15:35:29.6696187",
+  "grupoId": "ba595d4b-794b-40fc-87b7-2d612ab59031",
+  "adminId": "9471f713-9335-4647-ac5f-8ff336f4bad6"
+}
+{
+  "id": "5dbd24a7-3d54-4301-953d-c3cf018b8fee",
+  "nome": "DevNinja",
+  "valor": 50,
+  "tipoRecorrencia": "MENSAL",
+  "tipoDivisao": "IGUALITARIA",
+  "momentoCriacao": "2025-11-20T15:36:17.0813318",
+  "grupoId": "ba595d4b-794b-40fc-87b7-2d612ab59031",
+  "adminId": "9471f713-9335-4647-ac5f-8ff336f4bad6"
+}
+========================================================================================
+Grupo 2 - adm: Rick Lee
+ {
+    "id": "e5ae6511-8a99-4fb0-a323-2cff24b68c78",
+    "nomeGrupo": "Streammings",
+    "descricao": "Streammings compartilhados",
+    "icone": "string",
+    "adminId": "9471f713-9335-4647-ac5f-8ff336f4bad6",
+    "dataCriacao": "2025-11-20T15:51:06.724562",
+    "membros": [
+      {
+        "idMembro": "0363dda0-ce0d-40a7-9319-7270170657df",
+        "idUsuario": "9471f713-9335-4647-ac5f-8ff336f4bad6",
+        "nomeUsuario": "Rick Lee",
+        "status": "ATIVO"
+      },
+      {
+        "idMembro": "6c4e39b9-c3cf-45c2-98dc-02f2a1048088",
+        "idUsuario": "1df1780e-21ea-4abd-8736-7dbe066b0409",
+        "nomeUsuario": "Thálita Souza",
+        "status": "ATIVO"
+      }
+    ]
+  }
+
+despesas:
+{
+  "id": "f74493e0-291c-48e4-a1c4-d53df2803cd9",
+  "nome": "Prime",
+  "valor": 230,
+  "tipoRecorrencia": "MENSAL",
+  "tipoDivisao": "POR_VALOR",
+  "momentoCriacao": "2025-11-20T16:15:31.9034735",
+  "grupoId": "e5ae6511-8a99-4fb0-a323-2cff24b68c78",
+  "adminId": "9471f713-9335-4647-ac5f-8ff336f4bad6"
+}
+
+{
+  "id": "d3cdc089-83e3-42e1-909e-c7ec1bbc0e1e",
+  "nome": "Amazon",
+  "valor": 230,
+  "tipoRecorrencia": "UNICA",
+  "tipoDivisao": "POR_VALOR",
+  "momentoCriacao": "2025-11-20T16:47:28.4971365",
+  "grupoId": "e5ae6511-8a99-4fb0-a323-2cff24b68c78",
+  "adminId": "9471f713-9335-4647-ac5f-8ff336f4bad6"
+}

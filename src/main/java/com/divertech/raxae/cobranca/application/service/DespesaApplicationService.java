@@ -4,6 +4,7 @@ import com.divertech.raxae.cobranca.application.controller.DespesaRequest;
 import com.divertech.raxae.cobranca.application.controller.DespesaResponse;
 import com.divertech.raxae.cobranca.domain.Despesa;
 import com.divertech.raxae.cobranca.domain.StatusDespesa;
+import com.divertech.raxae.cobranca.domain.TipoRecorrencia;
 import com.divertech.raxae.cobranca.repository.DespesaRepository;
 import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.UUID;
 
 @Service
@@ -25,7 +28,8 @@ public class DespesaApplicationService implements DespesaService {
 
     private final UsuarioRepository usuarioRepository; 
     private final GrupoRepository grupoRepository;      
-    private final DespesaRepository despesaRepository; 
+    private final DespesaRepository despesaRepository;
+    private final GeracaoAutomaticaCobrancaService geracaoCobrancaService;
 
     @Override
     @Transactional
@@ -34,8 +38,17 @@ public class DespesaApplicationService implements DespesaService {
         Usuario admin = usuarioRepository.buscaUsuarioPorEmail(emailUsuarioLogado);
         Grupo grupo = grupoRepository.buscaGrupoPorId(grupoId);
         validaPermissao(grupo,admin);
+        Despesa despesa = despesaRepository.salvar(new Despesa(grupo, admin, request));
+        validaTipoRecorrencia(despesa);
         log.debug("[finish] DespesaApplicationService - registraDespesa");
-        return new DespesaResponse(despesaRepository.salvar(new Despesa(grupo, admin, request)));
+        return new DespesaResponse(despesa);
+    }
+
+    private void validaTipoRecorrencia(Despesa despesa) {
+        if(despesa.getTipoRecorrencia() == TipoRecorrencia.UNICA){
+            LocalDate dataVencimento = YearMonth.now().atDay(Math.min(despesa.getDiaVencimento(), YearMonth.now().lengthOfMonth()));
+            geracaoCobrancaService.gerarCobrancasParaDespesa(despesa, dataVencimento);
+        }
     }
 
     @Override

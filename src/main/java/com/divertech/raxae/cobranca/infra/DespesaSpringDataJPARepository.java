@@ -11,7 +11,8 @@ import java.util.UUID;
 
 public interface DespesaSpringDataJPARepository extends JpaRepository<Despesa, UUID> {
 
-    @Query("SELECT d FROM Despesa d WHERE d.diaVencimento = :diaVencimento AND d.status = :status")
-    List<Despesa> findByDiaVencimentoAndStatus(@Param("diaVencimento") Integer diaVencimento,
-                                                 @Param("status") StatusDespesa status);
+    @Query("SELECT d FROM Despesa d WHERE d.diaVencimento BETWEEN :diaInicio AND :diaFim AND d.status = :status")
+    List<Despesa> findByDiaVencimentoBetweenAndStatus(@Param("diaInicio") Integer diaInicio,
+                                                      @Param("diaFim") Integer diaFim,
+                                                      @Param("status") StatusDespesa status);
 }
