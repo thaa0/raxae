@@ -1,7 +1,8 @@
 package com.divertech.raxae.grupo.application.controller;
 
-import com.divertech.raxae.grupo.application.service.GrupoApplicationService;
+import com.divertech.raxae.grupo.application.service.BuscarHistoricoMembroService;
 import com.divertech.raxae.grupo.application.service.GrupoService;
+import com.divertech.raxae.grupo.application.service.HistoricoMembroResponse;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
@@ -14,14 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-import static com.divertech.raxae.handler.APIException.build;
-
 @RestController
 @RequestMapping("/v1/grupo")
 @RequiredArgsConstructor
 @Log4j2
 public class GrupoController {
     private final GrupoService grupoService;
+    private final BuscarHistoricoMembroService buscarHistoricoMembroService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -107,6 +107,21 @@ public class GrupoController {
     public List<MembroResponse> listarMembrosPorGrupo(@PathVariable UUID idDoGrupo){
        log.info("[start] GrupoController - listarMembrosPorGrupo");
        return grupoService.listarMembro(idDoGrupo);
+    }
+
+    @GetMapping("/{idDoGrupo}/historico/{idDoMembro}")
+    public ResponseEntity<HistoricoMembroResponse> buscarHistoricoMembro(
+            @PathVariable UUID idDoGrupo,
+            @PathVariable UUID idDoMembro,
+            @AuthenticationPrincipal Usuario usuarioAtual) {
+        log.info("[start] GrupoController - buscarHistoricoMembro");
+        verificaUsuarioAuth(usuarioAtual);
+        
+        grupoService.validaUsuarioAdmin(idDoGrupo, usuarioAtual.getId());
+
+        var response = buscarHistoricoMembroService.executar(idDoGrupo, idDoMembro);
+        log.debug("[finish] GrupoController - buscarHistoricoMembro");
+        return ResponseEntity.ok(response);
     }
 
     private static void verificaUsuarioAuth(Usuario usuarioAtual) {

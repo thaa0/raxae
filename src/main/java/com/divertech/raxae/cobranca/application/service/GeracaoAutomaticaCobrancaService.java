@@ -6,7 +6,7 @@ import com.divertech.raxae.cobranca.repository.DespesaRepository;
 import com.divertech.raxae.grupo.domain.Membro;
 import com.divertech.raxae.grupo.domain.StatusParticipacao;
 import com.divertech.raxae.handler.APIException;
-import com.divertech.raxae.usuario.domain.Usuario;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -133,6 +133,14 @@ public class GrupoApplicationService implements GrupoService {
         return lista;
     }
 
+    @Override
+    public void validaUsuarioAdmin(UUID idDoGrupo, UUID idUsuario) {
+        log.info("[start] GrupoApplicationService - validaUsuarioAdmin");
+        Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
+        possuiPermissaoDeAdmin(idUsuario, grupo);
+        log.debug("[finish] GrupoApplicationService - validaUsuarioAdmin");
+    }
+
     private void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
         if (!grupo.getAdminId().equals(idUsuarioAtual)) {
             throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário não autorizado para realizar alterações neste grupo.");

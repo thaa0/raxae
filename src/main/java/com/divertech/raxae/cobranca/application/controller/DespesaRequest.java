@@ -4,6 +4,7 @@ import com.divertech.raxae.cobranca.domain.TipoDivisao;
 import com.divertech.raxae.cobranca.domain.TipoRecorrencia;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
+@Setter
 public class DespesaRequest {
 
     @NotBlank(message = "Nome (descrição) é obrigatório")
@@ -33,5 +35,6 @@ public class DespesaRequest {
     private Map<UUID, BigDecimal> divisoesEspecificas;
 
     private String pixBeneficiado;
-    
+
+    private LocalDate dataVencimentoAvulsa;
 }

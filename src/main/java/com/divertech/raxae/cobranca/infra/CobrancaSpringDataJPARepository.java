@@ -16,7 +16,7 @@ public interface CobrancaSpringDataJPARepository extends JpaRepository<Cobranca,
     @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Cobranca c " +
            "WHERE c.despesa.id = :despesaId AND c.mesReferencia = :mesReferencia")
     boolean existsByDespesaIdAndMesReferencia(@Param("despesaId") UUID despesaId,
-                                               @Param("mesReferencia") String mesReferencia);
+                                              @Param("mesReferencia") String mesReferencia);
 
     @Query("SELECT c FROM Cobranca c " +
            "WHERE c.status = :status " +
@@ -27,4 +27,6 @@ public interface CobrancaSpringDataJPARepository extends JpaRepository<Cobranca,
             @Param("mesReferencia") String mesReferencia,
             @Param("dataVencimento") LocalDate dataVencimento
     );
+
+    List<Cobranca> findByDespesaGrupoIdAndUsuarioId(UUID grupoId, UUID usuarioId);
 }

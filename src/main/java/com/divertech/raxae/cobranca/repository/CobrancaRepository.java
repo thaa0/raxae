@@ -13,4 +13,5 @@ public interface CobrancaRepository {
     boolean existeCobrancaParaDespesaEMes(UUID despesaId, String mesReferencia);
 
     List<Cobranca> buscarPorStatusMesReferenciaEDataVencimento(StatusCobranca status, String mesReferencia, LocalDate dataVencimento);
+    List<Cobranca> findByDespesaGrupoIdAndUsuarioId(UUID grupoId, UUID usuarioId);
 }
