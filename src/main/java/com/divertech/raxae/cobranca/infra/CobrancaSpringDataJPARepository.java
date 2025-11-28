@@ -27,4 +27,11 @@ public interface CobrancaSpringDataJPARepository extends JpaRepository<Cobranca,
             @Param("mesReferencia") String mesReferencia,
             @Param("dataVencimento") LocalDate dataVencimento
     );
+
+    @Query("SELECT c FROM Cobranca c " +
+           "WHERE c.despesa.id = :despesaId AND c.usuario.id = :usuarioId")
+    Cobranca findByDespesaIdAndUsuarioId(
+            @Param("despesaId") UUID despesaId,
+            @Param("usuarioId") UUID usuarioId
+    );
 }
