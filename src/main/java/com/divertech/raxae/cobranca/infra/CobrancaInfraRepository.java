@@ -52,4 +52,19 @@ public class CobrancaInfraRepository implements CobrancaRepository {
                 .orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Cobrança não encontrada"));
     }
 
+    @Override
+    public List<Cobranca> buscarCobrancasPagasPorUsuarioEMes(UUID usuarioId, java.time.YearMonth mes) {
+        return jpaRepository.findByUsuarioIdAndStatusAndDataPagamentoNoMes(
+                usuarioId, 
+                StatusCobranca.PAGA, 
+                mes.getYear(), 
+                mes.getMonthValue()
+        );
+    }
+
+    @Override
+    public List<Cobranca> buscarTodasCobrancasPagasPorUsuario(UUID usuarioId) {
+        return jpaRepository.findByUsuarioIdAndStatus(usuarioId, StatusCobranca.PAGA);
+    }
+
 }

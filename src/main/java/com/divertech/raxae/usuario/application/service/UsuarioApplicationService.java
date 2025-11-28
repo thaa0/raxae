@@ -1,6 +1,8 @@
 package com.divertech.raxae.usuario.application.service;
 
 import com.divertech.raxae.auth.config.service.AuthService;
+import com.divertech.raxae.cobranca.domain.Cobranca;
+import com.divertech.raxae.cobranca.repository.CobrancaRepository;
 import com.divertech.raxae.plano.application.repository.AdesaoRepository; 
 import com.divertech.raxae.plano.application.repository.PlanoRepository; 
 import com.divertech.raxae.plano.domain.Adesao; 
@@ -16,6 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.YearMonth;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -26,6 +31,7 @@ public class UsuarioApplicationService implements UsuarioService {
 
     private final PlanoRepository planoRepository;
     private final AdesaoRepository adesaoRepository;
+    private final CobrancaRepository cobrancaRepository;
 
     @Override
     @Transactional 
@@ -47,12 +53,34 @@ public class UsuarioApplicationService implements UsuarioService {
     }
 
     @Override
-    public InfoUsuarioResponse getInfoUsuario(Usuario usuarioLogado) {
+    public InfoUsuarioResponse getInfoUsuario(Usuario usuarioLogado, YearMonth mes) {
         log.info("[start] UsuarioApplicationService - getInfoUsuario");
-        double economiaTotal = 1500.00; 
-        double totalPagoNoMes = 300.00; 
+        
+        // Se não foi fornecido um mês, usa o mês atual
+        YearMonth mesConsulta = mes != null ? mes : YearMonth.now();
+
+        var cobrancasPagasNoMes = cobrancaRepository.buscarCobrancasPagasPorUsuarioEMes(
+                usuarioLogado.getId(), mesConsulta);
+
+        double totalPagoNoMes = cobrancasPagasNoMes.stream()
+                .map(Cobranca::getValor)
+                .map(BigDecimal::doubleValue)
+                .reduce(0.0, Double::sum);
+
+        var todasCobrancasPagas = cobrancaRepository.buscarTodasCobrancasPagasPorUsuario(
+                usuarioLogado.getId());
+
+        double economiaTotal = todasCobrancasPagas.stream()
+                .mapToDouble(cobranca -> {
+                    BigDecimal valorTotalDespesa = cobranca.getDespesa().getValor();
+                    BigDecimal valorPago = cobranca.getValor();
+                    return valorTotalDespesa.subtract(valorPago).doubleValue();
+                })
+                .sum();
+        
         int numeroDeGrupos = usuarioRepository.contaGruposDoUsuario(usuarioLogado.getId());
         log.debug("DEBUG: Número de grupos do usuário: {}", numeroDeGrupos);
+        
         InfoUsuarioResponse infoUsuarioResponse = new InfoUsuarioResponse(
                 numeroDeGrupos,
                 economiaTotal,
