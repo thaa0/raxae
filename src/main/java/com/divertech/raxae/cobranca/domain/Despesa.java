@@ -1,11 +1,9 @@
 package com.divertech.raxae.cobranca.domain;
 
 import com.divertech.raxae.cobranca.application.controller.DespesaRequest;
-import com.divertech.raxae.cobranca.application.controller.DivisaoRequest;
 import com.divertech.raxae.grupo.domain.Grupo;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.domain.Usuario;
-import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,9 +11,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -54,6 +51,8 @@ public class Despesa {
 
     private String pixBeneficiado;
 
+    private LocalDate dataVencimentoAvulsa;
+
     @Column(nullable = false)
     private LocalDateTime momentoCriacao;
 
@@ -64,7 +63,7 @@ public class Despesa {
     @ElementCollection
     @CollectionTable(name = "despesa_divisoes_especificas", joinColumns = @JoinColumn(name = "despesa_id"))
     @MapKeyColumn(name = "usuario_id")
-    @Column(name = "valor", precision = 10, scale = 2)
+    @Column(name = "valor_divisao")
     private Map<UUID, BigDecimal> divisoesEspecificas;
 
     public Despesa(Grupo grupo, Usuario criadoPor, DespesaRequest request) {
@@ -75,10 +74,15 @@ public class Despesa {
         this.tipoDivisao = request.getTipoDivisao();
         this.tipoRecorrencia = request.getTipoRecorrencia();
         this.pixBeneficiado = request.getPixBeneficiado();
+        this.divisoesEspecificas = request.getDivisoesEspecificas();
         this.momentoCriacao = LocalDateTime.now();
         this.status = StatusDespesa.ATIVA;
-        this.diaVencimento = request.getDiaVencimento();
-        this.divisoesEspecificas = request.getDivisoesEspecificas();
+
+        if (request.getTipoRecorrencia() == TipoRecorrencia.UNICA) {
+            this.dataVencimentoAvulsa = request.getDataVencimentoAvulsa();
+        } else {
+            this.diaVencimento = request.getDiaVencimento();
+        }
     }
 
     public void setStatus(StatusDespesa status) {

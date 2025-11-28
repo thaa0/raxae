@@ -19,4 +19,5 @@ public interface GrupoService {
     String geraConvite(UUID idDoGrupo, Usuario usuarioAtual);
     List<GrupoResponse> getGruposPorUsuario(UUID id);
     List<MembroResponse> listarMembro(UUID idDoGrupo);
+    void validaUsuarioAdmin(UUID idDoGrupo, UUID idUsuario);
 }

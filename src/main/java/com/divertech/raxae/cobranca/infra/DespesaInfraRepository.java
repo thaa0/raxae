@@ -31,8 +31,12 @@ public class DespesaInfraRepository implements DespesaRepository {
 
     @Override
     public List<Despesa> buscarPorDiaVencimentoEStatus(Integer diaVencimento, StatusDespesa status) {
-        // Busca despesas desde hoje até o dia alvo
         Integer diaHoje = LocalDate.now().getDayOfMonth();
         return jpaRepository.findByDiaVencimentoBetweenAndStatus(diaHoje, diaVencimento, status);
+    }
+
+    @Override
+    public List<Despesa> findByGrupoIdAndCriadoPorId(UUID grupoId, UUID criadoPorId) {
+        return jpaRepository.findByGrupoIdAndCriadoPorId(grupoId, criadoPorId);
     }
 }
