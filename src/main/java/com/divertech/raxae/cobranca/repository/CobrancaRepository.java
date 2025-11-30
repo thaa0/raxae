@@ -18,4 +18,7 @@ public interface CobrancaRepository {
 
     Cobranca buscaPorId(UUID cobrancaId);
     List<Cobranca> findByDespesaGrupoIdAndUsuarioId(UUID grupoId, UUID usuarioId);
+    
+    List<Cobranca> buscarCobrancasPagasPorUsuarioEMes(UUID usuarioId, java.time.YearMonth mes);
+    List<Cobranca> buscarTodasCobrancasPagasPorUsuario(UUID usuarioId);
 }

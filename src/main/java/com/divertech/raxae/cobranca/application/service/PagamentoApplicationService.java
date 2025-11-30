@@ -78,6 +78,7 @@ public class PagamentoApplicationService implements PagamentoService {
         pagamentoRepository.salvar(pagamento);
 
         cobranca.setStatus(StatusCobranca.PAGA);
+        cobranca.setDataPagamento(java.time.LocalDate.now());
         cobrancaRepository.salvarVarias(java.util.List.of(cobranca));
 
         log.info("[finish] PagamentoApplicationService - registrarPagamentoComComprovante");
@@ -85,12 +86,10 @@ public class PagamentoApplicationService implements PagamentoService {
     }
 
     private void validarUsuarioNoGrupo(Grupo grupo, Usuario usuario) {
-        // Verifica se é o administrador do grupo
         if (grupo.getAdminId() != null && grupo.getAdminId().equals(usuario.getId())) {
             return;
         }
         
-        // Verifica se é membro ativo do grupo
         Membro membro = grupo.buscaMembro(usuario);
         if (membro == null || membro.getStatus() != StatusParticipacao.ATIVO) {
             throw APIException.build(HttpStatus.FORBIDDEN, "Usuário não pertence a este grupo");

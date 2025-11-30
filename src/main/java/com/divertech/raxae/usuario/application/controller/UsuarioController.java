@@ -39,9 +39,21 @@ public class UsuarioController {
 
     @GetMapping("/info")
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseEntity<InfoUsuarioResponse> getInfoUsuario(@AuthenticationPrincipal Usuario usuarioLogado) {
+    public ResponseEntity<InfoUsuarioResponse> getInfoUsuario(
+            @AuthenticationPrincipal Usuario usuarioLogado,
+            @RequestParam(required = false) String mes) {
         log.info("[start] UsuarioController - getInfoUsuario");
-        InfoUsuarioResponse infoUsuarioResponse = usuarioService.getInfoUsuario(usuarioLogado);
+        
+        java.time.YearMonth mesConsulta = null;
+        if (mes != null && !mes.isEmpty()) {
+            try {
+                mesConsulta = java.time.YearMonth.parse(mes);
+            } catch (Exception e) {
+                log.warn("Formato de mês inválido: {}. Usando mês atual.", mes);
+            }
+        }
+        
+        InfoUsuarioResponse infoUsuarioResponse = usuarioService.getInfoUsuario(usuarioLogado, mesConsulta);
         log.debug("[finish] UsuarioController - getInfoUsuario");
         return ResponseEntity.ok(infoUsuarioResponse);
     }

@@ -47,4 +47,8 @@ public class Cobranca {
         this.mesReferencia = YearMonth.from(dataVencimento).toString();
     }
 
+    public void setDataPagamento(LocalDate dataPagamento) {
+        this.dataPagamento = dataPagamento;
+    }
+
 }
