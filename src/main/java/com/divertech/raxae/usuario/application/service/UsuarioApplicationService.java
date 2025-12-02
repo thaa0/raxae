@@ -84,7 +84,10 @@ public class UsuarioApplicationService implements UsuarioService {
         InfoUsuarioResponse infoUsuarioResponse = new InfoUsuarioResponse(
                 numeroDeGrupos,
                 economiaTotal,
-                totalPagoNoMes
+                totalPagoNoMes,
+                usuarioLogado.getNomeCompleto(),
+                usuarioLogado.getEmail(),
+                usuarioLogado.getWhatsapp()
         );
         log.debug("DEBUG: Economia total: {}, Total pago no mês: {}", economiaTotal, totalPagoNoMes);
         log.debug("[finish] UsuarioApplicationService - getInfoUsuario");
