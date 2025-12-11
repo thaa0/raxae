@@ -55,10 +55,11 @@ public class DespesaApplicationService implements DespesaService {
     }
 
     private void gerarCobrancasSimples(Despesa despesa, Grupo grupo, Usuario pagador) {
+        log.info("[start] DespesaApplicationService - gerarCobrancaSimples");
         List<Cobranca> cobrancas = new ArrayList<>();
         long qtdMembros = grupo.getMembros().size();
         
-        if (qtdMembros > 1) {
+        if (qtdMembros >= 1) {
             BigDecimal valorPorCabeca = despesa.getValor().divide(BigDecimal.valueOf(qtdMembros), 2, java.math.RoundingMode.HALF_UP);
             
             grupo.getMembros().forEach(membro -> {
@@ -70,6 +71,8 @@ public class DespesaApplicationService implements DespesaService {
                 }
             });
             cobrancaRepository.salvarVarias(cobrancas);
+            log.debug("[finish] DespesaApplicationService - gerarCobrancaSimples");
+
         }
     }
 

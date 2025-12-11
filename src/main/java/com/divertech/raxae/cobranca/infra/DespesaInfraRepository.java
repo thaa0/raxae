@@ -39,4 +39,9 @@ public class DespesaInfraRepository implements DespesaRepository {
     public List<Despesa> findByGrupoIdAndCriadoPorId(UUID grupoId, UUID criadoPorId) {
         return jpaRepository.findByGrupoIdAndCriadoPorId(grupoId, criadoPorId);
     }
+
+    @Override
+    public List<Despesa> findByGrupoId(UUID grupoId) {
+        return jpaRepository.findByGrupoId(grupoId);
+    }
 }

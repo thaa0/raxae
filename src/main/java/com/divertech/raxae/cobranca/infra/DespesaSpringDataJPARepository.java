@@ -17,5 +17,6 @@ public interface DespesaSpringDataJPARepository extends JpaRepository<Despesa, U
                                                       @Param("status") StatusDespesa status);
 
 List<Despesa> findByGrupoIdAndCriadoPorId(UUID grupoId, UUID criadoPorId);
-                                                      
+
+    List<Despesa> findByGrupoId(UUID grupoId);
 }
