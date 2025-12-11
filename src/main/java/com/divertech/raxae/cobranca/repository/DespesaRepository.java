@@ -11,4 +11,5 @@ public interface DespesaRepository {
     Despesa buscaPorId(UUID id);
     List<Despesa> buscarPorDiaVencimentoEStatus(Integer diaVencimento, StatusDespesa status);
     List<Despesa> findByGrupoIdAndCriadoPorId(UUID grupoId, UUID criadoPorId);
+    List<Despesa> findByGrupoId(UUID grupoId);
 }

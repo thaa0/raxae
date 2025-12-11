@@ -4,6 +4,10 @@ import com.divertech.raxae.cobranca.domain.Cobranca;
 import com.divertech.raxae.cobranca.domain.Despesa;
 import com.divertech.raxae.cobranca.repository.CobrancaRepository;
 import com.divertech.raxae.cobranca.repository.DespesaRepository;
+import com.divertech.raxae.grupo.application.repository.MembroRepository;
+import com.divertech.raxae.grupo.domain.Membro;
+import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
+import com.divertech.raxae.usuario.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,13 +27,16 @@ public class BuscarHistoricoMembroService {
 
     private final CobrancaRepository cobrancaRepository;
     private final DespesaRepository despesaRepository;
+    private final MembroRepository membroRepository;
+
 
     @Transactional(readOnly = true)
     public HistoricoMembroResponse executar(UUID groupId, UUID memberId) {
         log.info("[BuscarHistoricoMembro] Iniciando busca. Grupo: {}, Membro: {}", groupId, memberId);
-
-        List<Despesa> despesas = despesaRepository.findByGrupoIdAndCriadoPorId(groupId, memberId);
-        List<Cobranca> cobrancas = cobrancaRepository.findByDespesaGrupoIdAndUsuarioId(groupId, memberId);
+        Membro membro = membroRepository.buscaMembro(memberId);
+        Usuario usuario = membro.getUsuario();
+        List<Despesa> despesas = despesaRepository.findByGrupoId(groupId);
+        List<Cobranca> cobrancas = cobrancaRepository.findByGrupoIdAndUsuarioId(groupId, usuario.getId());
 
         List<ItemHistoricoResponse> itens = new ArrayList<>();
 
