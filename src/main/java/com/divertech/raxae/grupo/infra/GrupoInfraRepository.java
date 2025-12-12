@@ -20,6 +20,7 @@ import java.util.UUID;
 @Log4j2
 public class GrupoInfraRepository implements GrupoRepository {
     private final GrupoSpringDataJPARepository grupoSpringDataJPARepository;
+
     @Override
     public Grupo buscaGrupoPorId(UUID idDoGrupo) {
         log.info("[start] GrupoInfraRepository - buscaGrupoPorId");
@@ -60,7 +61,8 @@ public class GrupoInfraRepository implements GrupoRepository {
     @Override
     public List<Grupo> buscaGruposPorUsuario(UUID id) {
         log.info("[start] GrupoInfraRepository - buscaGruposPorUsuario");
-        List<Grupo> grupos = grupoSpringDataJPARepository.findByMembrosUsuarioIdAndMembrosStatus(id, StatusParticipacao.ATIVO);
+        List<Grupo> grupos = grupoSpringDataJPARepository.findGruposAtivosPorUsuario(id,
+                StatusParticipacao.ATIVO, com.divertech.raxae.grupo.domain.StatusGrupo.ATIVO);
         log.debug("[finish] GrupoInfraRepository - buscaGruposPorUsuario");
         return grupos;
     }
