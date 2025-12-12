@@ -22,17 +22,20 @@ public class CobrancaInfraRepository implements CobrancaRepository {
     public List<Cobranca> salvarVarias(List<Cobranca> cobrancas) {
         return jpaRepository.saveAll(cobrancas);
     }
+
     @Override
     public List<Cobranca> buscaPorIdDaDespesa(UUID despesaId) {
         return jpaRepository.findByDespesaId(despesaId);
     }
+
     @Override
     public boolean existeCobrancaParaDespesaEMes(UUID despesaId, String mesReferencia) {
         return jpaRepository.existsByDespesaIdAndMesReferencia(despesaId, mesReferencia);
     }
 
     @Override
-    public List<Cobranca> buscarPorStatusMesReferenciaEDataVencimento(StatusCobranca status, String mesReferencia, LocalDate dataVencimento) {
+    public List<Cobranca> buscarPorStatusMesReferenciaEDataVencimento(StatusCobranca status, String mesReferencia,
+            LocalDate dataVencimento) {
         return jpaRepository.findByStatusAndMesReferenciaAndDataVencimento(status, mesReferencia, dataVencimento);
     }
 
@@ -60,16 +63,20 @@ public class CobrancaInfraRepository implements CobrancaRepository {
     @Override
     public List<Cobranca> buscarCobrancasPagasPorUsuarioEMes(UUID usuarioId, java.time.YearMonth mes) {
         return jpaRepository.findByUsuarioIdAndStatusAndDataPagamentoNoMes(
-                usuarioId, 
-                StatusCobranca.PAGA, 
-                mes.getYear(), 
-                mes.getMonthValue()
-        );
+                usuarioId,
+                StatusCobranca.PAGA,
+                mes.getYear(),
+                mes.getMonthValue());
     }
 
     @Override
     public List<Cobranca> buscarTodasCobrancasPagasPorUsuario(UUID usuarioId) {
         return jpaRepository.findByUsuarioIdAndStatus(usuarioId, StatusCobranca.PAGA);
+    }
+
+    @Override
+    public List<Cobranca> buscarCobrancasPagasRecebidasPorUsuario(UUID usuarioId) {
+        return jpaRepository.findByDespesaCriadoPorIdAndStatus(usuarioId, StatusCobranca.PAGA);
     }
 
 }

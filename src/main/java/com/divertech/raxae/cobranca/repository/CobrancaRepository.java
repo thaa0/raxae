@@ -9,17 +9,25 @@ import java.util.UUID;
 
 public interface CobrancaRepository {
     List<Cobranca> salvarVarias(List<Cobranca> cobrancas);
+
     List<Cobranca> buscaPorIdDaDespesa(UUID despesaId);
+
     boolean existeCobrancaParaDespesaEMes(UUID despesaId, String mesReferencia);
 
-    List<Cobranca> buscarPorStatusMesReferenciaEDataVencimento(StatusCobranca status, String mesReferencia, LocalDate dataVencimento);
+    List<Cobranca> buscarPorStatusMesReferenciaEDataVencimento(StatusCobranca status, String mesReferencia,
+            LocalDate dataVencimento);
 
     Cobranca buscarPorDespesaIdEUsuarioId(UUID despesaId, UUID usuarioId);
 
     Cobranca buscaPorId(UUID cobrancaId);
+
     List<Cobranca> findByDespesaGrupoIdAndUsuarioId(UUID grupoId, UUID usuarioId);
+
     List<Cobranca> findByGrupoIdAndUsuarioId(UUID grupoId, UUID usuarioId);
-    
+
     List<Cobranca> buscarCobrancasPagasPorUsuarioEMes(UUID usuarioId, java.time.YearMonth mes);
+
     List<Cobranca> buscarTodasCobrancasPagasPorUsuario(UUID usuarioId);
+
+    List<Cobranca> buscarCobrancasPagasRecebidasPorUsuario(UUID usuarioId);
 }
