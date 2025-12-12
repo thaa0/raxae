@@ -56,11 +56,16 @@ public class Grupo {
     @JoinColumn(name = "grupo_id")
     private Set<Membro> membros = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private StatusGrupo status = StatusGrupo.ATIVO;
+
     public Grupo(GrupoNovoRequest grupoRequest) {
         this.nomeGrupo = grupoRequest.getNomeGrupo();
         this.descricao = grupoRequest.getDescricao();
         this.icone = grupoRequest.getIcone();
         this.dataCriacao = LocalDateTime.now();
+        this.status = StatusGrupo.ATIVO;
     }
 
     public void atualizaInformacoes(GrupoEditaRequest grupoEditaRequest) {
@@ -80,7 +85,7 @@ public class Grupo {
     }
 
     public void adicionaNovoMembro(Membro membro) {
-        if(this.membros==null || this.membros.isEmpty()){
+        if (this.membros == null || this.membros.isEmpty()) {
             this.membros = new HashSet<>();
         }
         verificaSeJaEMembro(membro);
@@ -97,12 +102,14 @@ public class Grupo {
     }
 
     public boolean isAdmin(String email) {
-        if (this.administrador == null) return false;
+        if (this.administrador == null)
+            return false;
         return this.administrador.getEmail().equalsIgnoreCase(email);
     }
-    
+
     public UUID getAdminId() {
-        if (this.administrador == null) return null;
+        if (this.administrador == null)
+            return null;
         return this.administrador.getId();
     }
 

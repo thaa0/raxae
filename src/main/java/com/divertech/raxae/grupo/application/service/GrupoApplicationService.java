@@ -8,6 +8,7 @@ import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.application.repository.MembroRepository;
 import com.divertech.raxae.grupo.domain.Grupo;
 import com.divertech.raxae.grupo.domain.Membro;
+import com.divertech.raxae.grupo.domain.StatusGrupo;
 import com.divertech.raxae.grupo.domain.StatusParticipacao;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
@@ -52,7 +53,8 @@ public class GrupoApplicationService implements GrupoService {
         log.info("[start] GrupoApplicationService - deletarGrupo");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
         possuiPermissaoDeAdmin(idUsuarioAtual, grupo);
-        grupoRepository.apagaGrupo(grupo);
+        grupo.setStatus(StatusGrupo.EXCLUIDO);
+        grupoRepository.salva(grupo);
         log.debug("[finish] GrupoApplicationService - deletarGrupo");
     }
 
@@ -92,7 +94,7 @@ public class GrupoApplicationService implements GrupoService {
     public void adicionarMembro(UUID idGrupo, Usuario usuario) {
         log.info("[start] GrupoApplicationService - adicionarMembro");
         Grupo grupo = grupoRepository.buscaGrupoPorId(idGrupo);
-        if(grupo.getMembros()!=null){
+        if (grupo.getMembros() != null) {
             verificaSeMembroJaEstaNoGrupo(usuario, grupo);
         }
         Membro membro = membroRepository.salva(new Membro(usuario));
@@ -143,7 +145,8 @@ public class GrupoApplicationService implements GrupoService {
 
     private void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
         if (!grupo.getAdminId().equals(idUsuarioAtual)) {
-            throw APIException.build(HttpStatus.UNAUTHORIZED, "Usuário não autorizado para realizar alterações neste grupo.");
+            throw APIException.build(HttpStatus.UNAUTHORIZED,
+                    "Usuário não autorizado para realizar alterações neste grupo.");
         }
     }
 }
