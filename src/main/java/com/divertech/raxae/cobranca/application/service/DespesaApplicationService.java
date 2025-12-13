@@ -81,7 +81,7 @@ public class DespesaApplicationService implements DespesaService {
     public void excluiDespesa(UUID grupoId, UUID despesaId, Usuario user) {
         log.info("[start] DespesaApplicationService - excluiDespesa");
         Despesa despesa = despesaRepository.buscaPorId(despesaId);
-        if(despesa.getGrupo().getAdminId() != user.getId()) {
+        if(!despesa.getGrupo().getAdminId().equals(user.getId())) {
             throw APIException.build(HttpStatus.FORBIDDEN, "Apenas o administrador do grupo pode excluir despesas.");
         }
         despesa.setStatus(StatusDespesa.CANCELADA);
