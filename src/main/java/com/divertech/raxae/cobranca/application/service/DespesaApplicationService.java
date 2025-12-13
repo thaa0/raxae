@@ -85,4 +85,22 @@ public class DespesaApplicationService implements DespesaService {
         despesaRepository.salvar(despesa);
         log.debug("[finish] DespesaApplicationService - excluiDespesa");
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DespesaResponse> listarDespesasDoGrupo(UUID grupoId, String emailUsuarioLogado) {
+        log.info("[start] DespesaApplicationService - listarDespesasDoGrupo");
+        Usuario usuario = usuarioRepository.buscaUsuarioPorEmail(emailUsuarioLogado);
+        Grupo grupo = grupoRepository.buscaGrupoPorId(grupoId);
+
+        if (grupo.buscaMembro(usuario) == null) {
+            throw APIException.build(HttpStatus.FORBIDDEN, "Usuário não pertence ao grupo.");
+        }
+
+        List<Despesa> despesas = despesaRepository.findByGrupoId(grupoId);
+        log.debug("[finish] DespesaApplicationService - listarDespesasDoGrupo");
+        return despesas.stream()
+                .map(DespesaResponse::new)
+                .toList();
+    }
 }

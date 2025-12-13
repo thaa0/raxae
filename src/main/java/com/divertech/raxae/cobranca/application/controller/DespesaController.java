@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -31,7 +32,19 @@ public class DespesaController {
         log.debug("[finish] DespesaController - registrarDespesa");
         return response;
     }
-    
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<DespesaResponse> listarDespesas(
+            @PathVariable UUID grupoId,
+            @AuthenticationPrincipal Usuario usuarioAtual) {
+
+        log.info("[start] DespesaController - listarDespesas");
+        var response = despesaService.listarDespesasDoGrupo(grupoId, usuarioAtual.getEmail());
+        log.debug("[finish] DespesaController - listarDespesas");
+        return response;
+    }
+
     @DeleteMapping("/{despesaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluirDespesa(
