@@ -1,13 +1,32 @@
 package com.divertech.raxae.cobranca.application.service;
 
+import com.divertech.raxae.cobranca.application.controller.CobrancaResponse;
+import com.divertech.raxae.cobranca.domain.Cobranca;
+import com.divertech.raxae.cobranca.repository.CobrancaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class CobrancaApplicationService implements CobrancaService {
+
+    private final CobrancaRepository cobrancaRepository;
+
+    @Override
+    public List<CobrancaResponse> listarCobrancasPorUsuario(UUID usuarioId) {
+        log.info("[start] CobrancaApplicationService - listarCobrancasPorUsuario");
+        List<Cobranca> cobrancas = cobrancaRepository.buscarCobrancasPorUsuario(usuarioId);
+        log.info("[finish] CobrancaApplicationService - listarCobrancasPorUsuario - {} cobranças encontradas", cobrancas.size());
+        return cobrancas.stream()
+                .map(CobrancaResponse::from)
+                .collect(Collectors.toList());
+    }
 
 //    private List<Cobranca> calcularDivisao(Despesa despesa, List<Usuario> usuarios, DespesaRequest request) {
 //        List<Cobranca> cobrancas = new ArrayList<>();

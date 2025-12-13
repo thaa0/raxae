@@ -79,4 +79,9 @@ public class CobrancaInfraRepository implements CobrancaRepository {
         return jpaRepository.findByDespesaCriadoPorIdAndStatus(usuarioId, StatusCobranca.PAGA);
     }
 
+    @Override
+    public List<Cobranca> buscarCobrancasPorUsuario(UUID usuarioId) {
+        return jpaRepository.findByUsuarioId(usuarioId);
+    }
+
 }
