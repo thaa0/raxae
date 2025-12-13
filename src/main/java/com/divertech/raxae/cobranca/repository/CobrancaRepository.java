@@ -32,4 +32,6 @@ public interface CobrancaRepository {
     List<Cobranca> buscarCobrancasPagasRecebidasPorUsuario(UUID usuarioId);
 
     List<Cobranca> buscarCobrancasPorUsuario(UUID usuarioId);
+
+    List<Cobranca> buscarCobrancasPorGrupo(UUID grupoId);
 }

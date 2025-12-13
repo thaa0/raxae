@@ -7,4 +7,6 @@ import java.util.UUID;
 
 public interface CobrancaService {
     List<CobrancaResponse> listarCobrancasPorUsuario(UUID usuarioId);
+
+    List<CobrancaResponse> listarCobrancasPorGrupo(UUID grupoId, UUID usuarioAdminId);
 }

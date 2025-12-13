@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Controller para execução manual do processo de geração de cobranças
@@ -46,6 +47,20 @@ public class CobrancaController {
         log.info("[start] CobrancaController - listarMinhasCobrancas - usuarioId: {}", usuarioLogado.getId());
         List<CobrancaResponse> cobrancas = cobrancaService.listarCobrancasPorUsuario(usuarioLogado.getId());
         log.info("[finish] CobrancaController - listarMinhasCobrancas - {} cobranças retornadas", cobrancas.size());
+        return ResponseEntity.ok(cobrancas);
+    }
+
+    @GetMapping("/grupo/{grupoId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Listar todas as cobranças de um grupo (somente admin)",
+               description = "Retorna todas as cobranças de um grupo com todos os status. " +
+                           "Este endpoint é acessível apenas para administradores do grupo.")
+    public ResponseEntity<List<CobrancaResponse>> listarCobrancasPorGrupo(
+            @PathVariable UUID grupoId,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        log.info("[start] CobrancaController - listarCobrancasPorGrupo - grupoId: {}, usuarioId: {}", grupoId, usuarioLogado.getId());
+        List<CobrancaResponse> cobrancas = cobrancaService.listarCobrancasPorGrupo(grupoId, usuarioLogado.getId());
+        log.info("[finish] CobrancaController - listarCobrancasPorGrupo - {} cobranças retornadas", cobrancas.size());
         return ResponseEntity.ok(cobrancas);
     }
 

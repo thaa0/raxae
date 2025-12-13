@@ -84,4 +84,9 @@ public class CobrancaInfraRepository implements CobrancaRepository {
         return jpaRepository.findByUsuarioId(usuarioId);
     }
 
+    @Override
+    public List<Cobranca> buscarCobrancasPorGrupo(UUID grupoId) {
+        return jpaRepository.findByDespesaGrupoId(grupoId);
+    }
+
 }

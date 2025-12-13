@@ -3,6 +3,7 @@ package com.divertech.raxae.cobranca.application.service;
 import com.divertech.raxae.cobranca.application.controller.CobrancaResponse;
 import com.divertech.raxae.cobranca.domain.Cobranca;
 import com.divertech.raxae.cobranca.repository.CobrancaRepository;
+import com.divertech.raxae.grupo.application.service.GrupoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,24 @@ import java.util.stream.Collectors;
 public class CobrancaApplicationService implements CobrancaService {
 
     private final CobrancaRepository cobrancaRepository;
+    private final GrupoService grupoService;
 
     @Override
     public List<CobrancaResponse> listarCobrancasPorUsuario(UUID usuarioId) {
         log.info("[start] CobrancaApplicationService - listarCobrancasPorUsuario");
         List<Cobranca> cobrancas = cobrancaRepository.buscarCobrancasPorUsuario(usuarioId);
         log.info("[finish] CobrancaApplicationService - listarCobrancasPorUsuario - {} cobranças encontradas", cobrancas.size());
+        return cobrancas.stream()
+                .map(CobrancaResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CobrancaResponse> listarCobrancasPorGrupo(UUID grupoId, UUID usuarioAdminId) {
+        log.info("[start] CobrancaApplicationService - listarCobrancasPorGrupo - grupoId: {}, usuarioAdminId: {}", grupoId, usuarioAdminId);
+        grupoService.validaUsuarioAdmin(grupoId, usuarioAdminId);
+        List<Cobranca> cobrancas = cobrancaRepository.buscarCobrancasPorGrupo(grupoId);
+        log.info("[finish] CobrancaApplicationService - listarCobrancasPorGrupo - {} cobranças encontradas", cobrancas.size());
         return cobrancas.stream()
                 .map(CobrancaResponse::from)
                 .collect(Collectors.toList());
