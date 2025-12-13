@@ -52,6 +52,6 @@ public class DespesaController {
             @PathVariable UUID despesaId,
             @AuthenticationPrincipal Usuario usuarioAtual) {
         
-        despesaService.excluiDespesa(grupoId, despesaId, usuarioAtual.getEmail());
+        despesaService.excluiDespesa(grupoId, despesaId, usuarioAtual);
     }
 }

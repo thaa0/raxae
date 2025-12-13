@@ -78,9 +78,12 @@ public class DespesaApplicationService implements DespesaService {
 
     @Override
     @Transactional
-    public void excluiDespesa(UUID grupoId, UUID despesaId, String emailUsuarioLogado) {
+    public void excluiDespesa(UUID grupoId, UUID despesaId, Usuario user) {
         log.info("[start] DespesaApplicationService - excluiDespesa");
         Despesa despesa = despesaRepository.buscaPorId(despesaId);
+        if(despesa.getGrupo().getAdminId() != user.getId()) {
+            throw APIException.build(HttpStatus.FORBIDDEN, "Apenas o administrador do grupo pode excluir despesas.");
+        }
         despesa.setStatus(StatusDespesa.CANCELADA);
         despesaRepository.salvar(despesa);
         log.debug("[finish] DespesaApplicationService - excluiDespesa");
