@@ -32,31 +32,31 @@ public class GeracaoLembreteService {
         executarGeracaoLembretesInterno(Optional.empty());
     }
 
-    public void executarGeracaoLembretes(UUID idGrupo) {
-        executarGeracaoLembretesInterno(Optional.of(idGrupo));
+    public void executarGeracaoLembretes(UUID idDespesa) {
+        executarGeracaoLembretesInterno(Optional.of(idDespesa));
     }
 
-    private void executarGeracaoLembretesInterno(Optional<UUID> idGrupo) {
-        String contextoGrupo = idGrupo.map(id -> " para o Grupo " + id).orElse("");
-        log.info("=== Iniciando Geração de Lembretes Automáticos{} ===", contextoGrupo);
+    private void executarGeracaoLembretesInterno(Optional<UUID> idDespesa) {
+        String contextoDespesa = idDespesa.map(id -> " para o Despesa " + id).orElse("");
+        log.info("=== Iniciando Geração de Lembretes Automáticos{} ===", contextoDespesa);
 
         int totalEnviados = 0;
         try {
-            int venceDaqui2Dias = idGrupo.map(this::processarLembretesVenceDaqui2Dias)
+            int venceDaqui2Dias = idDespesa.map(this::processarLembretesVenceDaqui2Dias)
                     .orElseGet(this::processarLembretesVenceDaqui2Dias);
             totalEnviados += venceDaqui2Dias;
 
-            int venceAmanha = idGrupo.map(this::processarLembretesVenceAmanha)
+            int venceAmanha = idDespesa.map(this::processarLembretesVenceAmanha)
                     .orElseGet(this::processarLembretesVenceAmanha);
             totalEnviados += venceAmanha;
 
-            int venceHoje = idGrupo.map(this::processarLembretesVenceHoje)
+            int venceHoje = idDespesa.map(this::processarLembretesVenceHoje)
                     .orElseGet(this::processarLembretesVenceHoje);
             totalEnviados += venceHoje;
 
-            logResumoExecucao(venceDaqui2Dias, venceAmanha, venceHoje, totalEnviados, idGrupo);
+            logResumoExecucao(venceDaqui2Dias, venceAmanha, venceHoje, totalEnviados, idDespesa);
         } catch (Exception e) {
-            log.error("[error] Erro durante execução da geração de lembretes{}", contextoGrupo, e);
+            log.error("[error] Erro durante execução da geração de lembretes{}", contextoDespesa, e);
         }
     }
 
@@ -67,9 +67,9 @@ public class GeracaoLembreteService {
     }
 
     @Transactional(readOnly = true)
-    public int processarLembretesVenceDaqui2Dias(UUID idGrupo) {
+    public int processarLembretesVenceDaqui2Dias(UUID idDespesa) {
         LocalDate daquiDoisDias = LocalDate.now().plusDays(DIAS_ANTECEDENCIA_LEMBRETE_1);
-        return processarLembretes(TipoLembrete.VENCE_DAQUI_2_DIAS, daquiDoisDias, Optional.of(idGrupo));
+        return processarLembretes(TipoLembrete.VENCE_DAQUI_2_DIAS, daquiDoisDias, Optional.of(idDespesa));
     }
 
     @Transactional(readOnly = true)
@@ -79,9 +79,9 @@ public class GeracaoLembreteService {
     }
 
     @Transactional(readOnly = true)
-    public int processarLembretesVenceAmanha(UUID idGrupo) {
+    public int processarLembretesVenceAmanha(UUID idDespesa) {
         LocalDate amanha = LocalDate.now().plusDays(DIAS_ANTECEDENCIA_LEMBRETE_2);
-        return processarLembretes(TipoLembrete.VENCE_AMANHA, amanha, Optional.of(idGrupo));
+        return processarLembretes(TipoLembrete.VENCE_AMANHA, amanha, Optional.of(idDespesa));
     }
 
     @Transactional(readOnly = true)
@@ -91,20 +91,20 @@ public class GeracaoLembreteService {
     }
 
     @Transactional(readOnly = true)
-    public int processarLembretesVenceHoje(UUID idGrupo) {
+    public int processarLembretesVenceHoje(UUID idDespesa) {
         LocalDate hoje = LocalDate.now().plusDays(DIAS_ANTECEDENCIA_LEMBRETE_3);
-        return processarLembretes(TipoLembrete.VENCE_HOJE, hoje, Optional.of(idGrupo));
+        return processarLembretes(TipoLembrete.VENCE_HOJE, hoje, Optional.of(idDespesa));
     }
 
-    private int processarLembretes(TipoLembrete tipoLembrete, LocalDate dataVencimento, Optional<UUID> idGrupo) {
-        String contextoGrupo = idGrupo.map(id -> " para o Grupo " + id).orElse("");
-        log.info("Processando lembretes: {} ({}){}", tipoLembrete, dataVencimento, contextoGrupo);
+    private int processarLembretes(TipoLembrete tipoLembrete, LocalDate dataVencimento, Optional<UUID> idDespesa) {
+        String contextoDespesa = idDespesa.map(id -> " para o Despesa " + id).orElse("");
+        log.info("Processando lembretes: {} ({}){}", tipoLembrete, dataVencimento, contextoDespesa);
 
-        List<Cobranca> cobrancas = buscarCobrancasPendentes(dataVencimento, idGrupo);
+        List<Cobranca> cobrancas = buscarCobrancasPendentes(dataVencimento, idDespesa);
         log.info("Encontradas {} cobranças que {} {}",
                 cobrancas.size(),
                 obterDescricaoVencimento(tipoLembrete),
-                contextoGrupo);
+                contextoDespesa);
 
         int sucessos = 0;
         for (Cobranca cobranca : cobrancas) {
@@ -119,31 +119,31 @@ public class GeracaoLembreteService {
         }
 
         log.info("Lembretes '{}' enviados{}: {}/{}",
-                tipoLembrete, contextoGrupo, sucessos, cobrancas.size());
+                tipoLembrete, contextoDespesa, sucessos, cobrancas.size());
         return sucessos;
     }
 
     private void logResumoExecucao(int venceDaqui2Dias, int venceAmanha, int venceHoje,
-                                   int totalEnviados, Optional<UUID> idGrupo) {
-        String contextoGrupo = idGrupo.map(id -> " para o Grupo " + id).orElse("");
+                                   int totalEnviados, Optional<UUID> idDespesa) {
+        String contextoDespesa = idDespesa.map(id -> " para o Despesa " + id).orElse("");
 
         log.info("========================================");
-        log.info("=== Resumo da Execução{} ===", contextoGrupo);
+        log.info("=== Resumo da Execução{} ===", contextoDespesa);
         log.info("Lembretes 'Vence Daqui 2 Dias': {}", venceDaqui2Dias);
         log.info("Lembretes 'Vence Amanhã': {}", venceAmanha);
         log.info("Lembretes 'Vence Hoje': {}", venceHoje);
         log.info("Total de lembretes enviados: {}", totalEnviados);
     }
 
-    private List<Cobranca> buscarCobrancasPendentes(LocalDate dataVencimento, Optional<UUID> idGrupo) {
+    private List<Cobranca> buscarCobrancasPendentes(LocalDate dataVencimento, Optional<UUID> idDespesa) {
         String mesReferencia = YearMonth.from(LocalDate.now()).toString();
 
-        if (idGrupo.isPresent()) {
-            return cobrancaRepository.buscarPorStatusMesReferenciaDataVencimentoEGrupo(
+        if (idDespesa.isPresent()) {
+            return cobrancaRepository.buscarPorStatusMesReferenciaDataVencimentoEDespesa(
                     StatusCobranca.PENDENTE,
                     mesReferencia,
                     dataVencimento,
-                    idGrupo.get()
+                    idDespesa.get()
             );
         }
 

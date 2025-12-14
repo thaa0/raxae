@@ -33,13 +33,13 @@ public class NotificacaoController {
         return ResponseEntity.ok("Processo de envio de lembretes executado com sucesso. Verifique os logs para detalhes.");
     }
 
-    @PostMapping("{idGrupo}/enviar-automaticos")
+    @PostMapping("{idDespesa}/enviar-automaticos")
     @Operation(summary = "Enviar lembretes automáticos manualmente",
             description = "Executa o processo de envio de lembretes de cobrança via WhatsApp. " +
                     "Normalmente este processo roda automaticamente às 09:00 via CRON Job. " +
                     "Este endpoint permite execução manual para testes.")
-    public ResponseEntity<String> enviarLembretesAutomaticos(@PathVariable UUID idGrupo) {
-        geracaoLembreteService.executarGeracaoLembretes(idGrupo);
+    public ResponseEntity<String> enviarLembretesAutomaticos(@PathVariable UUID idDespesa) {
+        geracaoLembreteService.executarGeracaoLembretes(idDespesa);
         return ResponseEntity.ok("Processo de envio de lembretes executado com sucesso. Verifique os logs para detalhes.");
     }
 }
