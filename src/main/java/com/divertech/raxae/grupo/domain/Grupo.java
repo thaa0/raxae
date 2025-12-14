@@ -37,8 +37,9 @@ public class Grupo {
     @NotBlank
     private String descricao;
 
-    @NotBlank
-    private String icone;
+    @Lob
+    @Column(name = "icone", columnDefinition = "BLOB")
+    private byte[] icone;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -63,7 +64,6 @@ public class Grupo {
     public Grupo(GrupoNovoRequest grupoRequest) {
         this.nomeGrupo = grupoRequest.getNomeGrupo();
         this.descricao = grupoRequest.getDescricao();
-        this.icone = grupoRequest.getIcone();
         this.dataCriacao = LocalDateTime.now();
         this.status = StatusGrupo.ATIVO;
     }
@@ -75,7 +75,7 @@ public class Grupo {
         if (grupoEditaRequest.getDescricao() != null && !grupoEditaRequest.getDescricao().isBlank()) {
             this.descricao = grupoEditaRequest.getDescricao();
         }
-        if (grupoEditaRequest.getIcone() != null && !grupoEditaRequest.getIcone().isBlank()) {
+        if (grupoEditaRequest.getIcone() != null && grupoEditaRequest.getIcone().length > 0) {
             this.icone = grupoEditaRequest.getIcone();
         }
     }

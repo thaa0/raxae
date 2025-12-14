@@ -18,7 +18,6 @@ public class GrupoResponse {
     private UUID id;
     private String nomeGrupo;
     private String descricao;
-    private String icone;
     private UUID adminId;
     private LocalDateTime dataCriacao;
     private Set<MembroResponse> membros;
@@ -28,7 +27,6 @@ public class GrupoResponse {
         this.id = grupo.getId();
         this.nomeGrupo = grupo.getNomeGrupo();
         this.descricao = grupo.getDescricao();
-        this.icone = grupo.getIcone();
         this.adminId = grupo.getAdminId();
         this.dataCriacao = grupo.getDataCriacao();
         converteMembros(grupo);

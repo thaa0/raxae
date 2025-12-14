@@ -19,7 +19,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,11 +38,13 @@ public class GrupoApplicationService implements GrupoService {
 
     @Override
     @Transactional
-    public GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest, Usuario usuarioAtual) {
+    public GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest, MultipartFile icone, Usuario usuarioAtual) {
         log.info("[start] GrupoApplicationService - criaGrupo");
         Usuario admin = usuarioRepository.buscaUsuarioPorId(usuarioAtual.getId());
         Grupo grupo = new Grupo(grupoRequest);
         grupo.setAdministrador(admin);
+        byte[] iconeBytes = converterParaByteArray(icone);
+        grupo.setIcone(iconeBytes);
         grupoRepository.salva(grupo);
         adicionarMembro(grupo.getId(), usuarioAtual);
         log.debug("[finish] GrupoApplicationService - criaGrupo");
@@ -143,10 +147,27 @@ public class GrupoApplicationService implements GrupoService {
         log.debug("[finish] GrupoApplicationService - validaUsuarioAdmin");
     }
 
+    @Override
+    public byte[] buscarIconePorGrupoId(UUID idDoGrupo) {
+        log.info("[start] GrupoApplicationService - buscarIconePorGrupoId");
+        Grupo grupo = grupoRepository.buscaGrupoPorId(idDoGrupo);
+        log.debug("[finish] GrupoApplicationService - buscarIconePorGrupoId");
+        return grupo.getIcone();
+    }
+
     private void possuiPermissaoDeAdmin(UUID idUsuarioAtual, Grupo grupo) {
         if (!grupo.getAdminId().equals(idUsuarioAtual)) {
             throw APIException.build(HttpStatus.UNAUTHORIZED,
                     "Usuário não autorizado para realizar alterações neste grupo.");
+        }
+    }
+
+    private byte[] converterParaByteArray(MultipartFile file) {
+        try {
+            return file.getBytes();
+        } catch (IOException e) {
+            log.error("Erro ao converter arquivo para byte array: {}", e.getMessage());
+            throw APIException.build(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao processar o comprovante");
         }
     }
 }

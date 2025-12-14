@@ -5,12 +5,13 @@ import com.divertech.raxae.grupo.application.controller.GrupoNovoRequest;
 import com.divertech.raxae.grupo.application.controller.GrupoResponse;
 import com.divertech.raxae.grupo.application.controller.MembroResponse;
 import com.divertech.raxae.usuario.domain.Usuario;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface GrupoService {
-    GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest, Usuario usuarioAtual);
+    GrupoResponse criaGrupo(GrupoNovoRequest grupoRequest, MultipartFile icone, Usuario usuarioAtual);
     void deletarGrupo(UUID idDoGrupo, UUID idUsuarioAtual);
     GrupoResponse getGrupoById(UUID idDoGrupo, UUID idUsuarioAtual);
     void editarGrupo(UUID idDoGrupo, GrupoEditaRequest grupoEditaRequest, UUID idUsuarioAtual);
@@ -20,4 +21,5 @@ public interface GrupoService {
     List<GrupoResponse> getGruposPorUsuario(UUID id);
     List<MembroResponse> listarMembro(UUID idDoGrupo);
     void validaUsuarioAdmin(UUID idDoGrupo, UUID idUsuario);
+    byte[] buscarIconePorGrupoId(UUID idDoGrupo);
 }

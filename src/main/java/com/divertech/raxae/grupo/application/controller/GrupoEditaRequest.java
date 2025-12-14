@@ -8,5 +8,5 @@ import lombok.Getter;
 public class GrupoEditaRequest {
     private String nomeGrupo;
     private String descricao;
-    private String icone;
+    private byte[] icone;
 }

@@ -5,12 +5,22 @@ import com.divertech.raxae.grupo.application.service.GrupoService;
 import com.divertech.raxae.grupo.application.service.HistoricoMembroResponse;
 import com.divertech.raxae.handler.APIException;
 import com.divertech.raxae.usuario.domain.Usuario;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,11 +33,43 @@ public class GrupoController {
     private final GrupoService grupoService;
     private final BuscarHistoricoMembroService buscarHistoricoMembroService;
 
-    @PostMapping
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<GrupoResponse> criaGrupo(@RequestBody GrupoNovoRequest grupoNovoRequest, @AuthenticationPrincipal Usuario usuarioAtual){
+    public ResponseEntity<GrupoResponse> criaGrupo(
+            @Parameter(
+                    description = "Dados do grupo em JSON",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = GrupoNovoRequest.class)
+                    )
+            )
+            @RequestPart("grupo")
+            String grupoJson,
+            @Parameter(
+                    description = "Ícone do grupo",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.IMAGE_JPEG_VALUE,
+                            schema = @Schema(type = "string", format = "binary")
+                    )
+            )
+            @RequestPart("icone")
+            MultipartFile icone,
+            @AuthenticationPrincipal Usuario usuarioAtual
+    ){
         log.info("[start] GrupoController - criaGrupo");
-        GrupoResponse grupoResponse = grupoService.criaGrupo(grupoNovoRequest,usuarioAtual);
+        GrupoNovoRequest grupoNovoRequest;
+        try {
+            grupoNovoRequest = new ObjectMapper()
+                    .readValue(grupoJson, GrupoNovoRequest.class);
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "JSON do grupo inválido", e
+            );
+        }
+        GrupoResponse grupoResponse = grupoService.criaGrupo(grupoNovoRequest,icone,usuarioAtual);
         log.debug("[finish] GrupoController - criaGrupo");
         return ResponseEntity.status(HttpStatus.CREATED).body(grupoResponse);
     }
@@ -122,6 +164,22 @@ public class GrupoController {
         var response = buscarHistoricoMembroService.executar(idDoGrupo, idDoMembro);
         log.debug("[finish] GrupoController - buscarHistoricoMembro");
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{idDoGrupo}/icone")
+    public ResponseEntity<byte[]> buscarIcone(
+            @PathVariable UUID idDoGrupo) {
+        log.info("[start] GrupoController - buscarComprovante para a cobranca: {}", idDoGrupo);
+        byte[] icone = grupoService.buscarIconePorGrupoId(idDoGrupo);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        headers.setContentLength(icone.length);
+        headers.setContentDispositionFormData("attachment", "icone.jpg");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(icone);
     }
 
     private static void verificaUsuarioAuth(Usuario usuarioAtual) {
