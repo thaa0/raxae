@@ -34,4 +34,6 @@ public interface CobrancaRepository {
     List<Cobranca> buscarCobrancasPorUsuario(UUID usuarioId);
 
     List<Cobranca> buscarCobrancasPorGrupo(UUID grupoId);
+
+    List<Cobranca> buscarPorStatusMesReferenciaDataVencimentoEGrupo(StatusCobranca statusCobranca, String string, LocalDate daquiDoisDias, UUID idGrupo);
 }

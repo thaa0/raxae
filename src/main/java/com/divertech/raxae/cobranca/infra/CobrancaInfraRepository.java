@@ -89,4 +89,9 @@ public class CobrancaInfraRepository implements CobrancaRepository {
         return jpaRepository.findByDespesaGrupoId(grupoId);
     }
 
+    @Override
+    public List<Cobranca> buscarPorStatusMesReferenciaDataVencimentoEGrupo(StatusCobranca statusCobranca, String string, LocalDate daquiDoisDias, UUID idGrupo) {
+        return jpaRepository.findByGrupoIdAndStatusAndMesReferenciaAndDataVencimento(statusCobranca, string, daquiDoisDias, idGrupo);
+    }
+
 }

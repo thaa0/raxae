@@ -86,7 +86,6 @@ public class WhatsAppService {
                     .toNumber(numeroWhatsApp)
                     .type("media")
                     .message(urlMidia)
-                    .text(texto)
                     .build();
 
             WhatsAppMessageResponse response = maytapiClient.sendMessage(

@@ -21,9 +21,6 @@ public class WhatsAppMessageRequest {
     @JsonProperty("message")
     private String message;
 
-    @JsonProperty("text")
-    private String text;
-
     @JsonProperty("typing")
     private String typing; // "typing" or "recording" (opcional)
 

@@ -76,4 +76,13 @@ public interface CobrancaSpringDataJPARepository extends JpaRepository<Cobranca,
                      "WHERE g.id = :grupoId " +
                      "ORDER BY c.dataVencimento DESC")
        List<Cobranca> findByDespesaGrupoId(@Param("grupoId") UUID grupoId);
+
+       @Query("SELECT c FROM Cobranca c " +
+                     "JOIN FETCH c.despesa d " +
+                     "JOIN FETCH d.grupo g " +
+                     "WHERE c.status = :statusCobranca " +
+                     "AND c.mesReferencia = :string " +
+                     "AND c.dataVencimento = :daquiDoisDias " +
+                     "AND g.id = :idGrupo")
+       List<Cobranca> findByGrupoIdAndStatusAndMesReferenciaAndDataVencimento(StatusCobranca statusCobranca, String string, LocalDate daquiDoisDias, UUID idGrupo);
 }

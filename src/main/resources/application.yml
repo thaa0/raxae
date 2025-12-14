@@ -34,8 +34,8 @@ springdoc:
 
 raxae:
   jwt:
-    expiracao: 43200000
-    chave: m7UoDqT1UjKg0mPVv8WrBpdFjM9iM0Jr9N9Z4VbVXZl4r7y3hwc5v1bOq/MLjW7W9RhtFJvFsBLOdN0bY9VYhw==
+    expiracao: ${JWT_EXPIRACAO:43200000}
+    chave: ${JWT_KEY:m7UoDqT1UjKg0mPVv8WrBpdFjM9iM0Jr9N9Z4VbVXZl4r7y3hwc5v1bOq/MLjW7W9RhtFJvFsBLOdN0bY9VYhw==}
 
 maytapi:
   base-url: ${BASE_URL_MAYTAPI:https://api.maytapi.com}
