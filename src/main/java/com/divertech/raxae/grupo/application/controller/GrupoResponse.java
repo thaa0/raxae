@@ -6,6 +6,7 @@ import com.divertech.raxae.grupo.domain.StatusParticipacao;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class GrupoResponse {
     private UUID adminId;
     private LocalDateTime dataCriacao;
     private Set<MembroResponse> membros;
+    private BigDecimal valorTotalDespesas;
 
     public GrupoResponse(Grupo grupo) {
         this.id = grupo.getId();
@@ -30,7 +32,9 @@ public class GrupoResponse {
         this.adminId = grupo.getAdminId();
         this.dataCriacao = grupo.getDataCriacao();
         converteMembros(grupo);
-
+        this.valorTotalDespesas = grupo.getDespesas().stream()
+                .map(despesa -> despesa.getValor() != null ? despesa.getValor()  : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private void converteMembros(Grupo grupo) {
