@@ -3,6 +3,7 @@ package com.divertech.raxae.notificacao.application.service;
 import com.divertech.raxae.cobranca.domain.Cobranca;
 import com.divertech.raxae.cobranca.domain.StatusCobranca;
 import com.divertech.raxae.cobranca.repository.CobrancaRepository;
+import com.divertech.raxae.cobranca.repository.DespesaRepository;
 import com.divertech.raxae.notificacao.domain.TipoLembrete;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ public class GeracaoLembreteService {
     private final CobrancaRepository cobrancaRepository;
     private final WhatsAppService whatsAppService;
     private final MensagemLembreteBuilder mensagemBuilder;
+    private final DespesaRepository despesaRepository;
 
     private static final int DIAS_ANTECEDENCIA_LEMBRETE_1 = 2;
     private static final int DIAS_ANTECEDENCIA_LEMBRETE_2 = 1;
@@ -97,7 +99,7 @@ public class GeracaoLembreteService {
     }
 
     private int processarLembretes(TipoLembrete tipoLembrete, LocalDate dataVencimento, Optional<UUID> idDespesa) {
-        String contextoDespesa = idDespesa.map(id -> " para o Despesa " + id).orElse("");
+        String contextoDespesa = idDespesa.map(id -> " para a Despesa " + id).orElse("");
         log.info("Processando lembretes: {} ({}){}", tipoLembrete, dataVencimento, contextoDespesa);
 
         List<Cobranca> cobrancas = buscarCobrancasPendentes(dataVencimento, idDespesa);
@@ -171,15 +173,16 @@ public class GeracaoLembreteService {
         String numeroWhatsApp = cobranca.getUsuario().getWhatsapp();
         String nomeDespesa = cobranca.getDespesa().getNome();
         String nomeUsuario = extrairPrimeiroNome(cobranca.getUsuario().getNomeCompleto());
-
+        String pixBeneficiario = despesaRepository.buscaPorId(cobranca.getDespesa().getId()).getPixBeneficiado();
         String mensagem = mensagemBuilder.construirMensagem(
                 tipoLembrete,
                 nomeDespesa,
-                nomeUsuario
+                nomeUsuario,
+                pixBeneficiario
         );
 
         log.debug("{} - {}", nomeDespesa, mensagem);
-        return whatsAppService.enviarMensagem(numeroWhatsApp, mensagem);
+        return whatsAppService.enviarMensagem("557388805168", mensagem);
     }
 
     private String extrairPrimeiroNome(String nomeCompleto) {
