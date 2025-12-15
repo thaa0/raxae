@@ -47,33 +47,9 @@ public class DespesaApplicationService implements DespesaService {
         }
 
         Despesa despesa = despesaRepository.salvar(new Despesa(grupo, admin, request));
-        
-        gerarCobrancasSimples(despesa, grupo, admin);
 
         log.debug("[finish] DespesaApplicationService - registraDespesa");
         return new DespesaResponse(despesa);
-    }
-
-    private void gerarCobrancasSimples(Despesa despesa, Grupo grupo, Usuario pagador) {
-        log.info("[start] DespesaApplicationService - gerarCobrancaSimples");
-        List<Cobranca> cobrancas = new ArrayList<>();
-        long qtdMembros = grupo.getMembros().size();
-        
-        if (qtdMembros >= 1) {
-            BigDecimal valorPorCabeca = despesa.getValor().divide(BigDecimal.valueOf(qtdMembros), 2, java.math.RoundingMode.HALF_UP);
-            
-            grupo.getMembros().forEach(membro -> {
-                if (!membro.getUsuario().getId().equals(pagador.getId())) {
-                    LocalDate vencimento = despesa.getDataVencimentoAvulsa() != null ? 
-                                           despesa.getDataVencimentoAvulsa() : LocalDate.now().plusDays(7);
-                    
-                    cobrancas.add(new Cobranca(despesa, membro.getUsuario(), valorPorCabeca, StatusCobranca.PENDENTE, vencimento));
-                }
-            });
-            cobrancaRepository.salvarVarias(cobrancas);
-            log.debug("[finish] DespesaApplicationService - gerarCobrancaSimples");
-
-        }
     }
 
     @Override
@@ -103,6 +79,7 @@ public class DespesaApplicationService implements DespesaService {
         List<Despesa> despesas = despesaRepository.findByGrupoId(grupoId);
         log.debug("[finish] DespesaApplicationService - listarDespesasDoGrupo");
         return despesas.stream()
+                .filter(d -> d.getStatus().equals(StatusDespesa.ATIVA))
                 .map(DespesaResponse::new)
                 .toList();
     }
