@@ -26,23 +26,13 @@ public class BuscarHistoricoMembroService {
 
     private final CobrancaRepository cobrancaRepository;
     private final DespesaRepository despesaRepository;
-    private final GrupoRepository grupoRepository;
+    private final MembroRepository membroRepository;
 
 
     @Transactional(readOnly = true)
     public HistoricoMembroResponse executar(UUID groupId, UUID memberId) {
         log.info("[BuscarHistoricoMembro] Iniciando busca. Grupo: {}, Membro: {}", groupId, memberId);
-        Grupo grupo = grupoRepository.buscaGrupoPorId(groupId);
-        Membro membro = grupo.getMembros().stream().map(g -> {
-            if (g.getUsuario().getId().equals(memberId)) {
-                return g;
-            }
-            return null;
-        }).filter(Objects::nonNull).findFirst().orElseThrow(() -> {
-            log.error("[BuscarHistoricoMembro] Membro não encontrado no grupo. Grupo: {}, Membro: {}", groupId, memberId);
-            return new RuntimeException("Membro não encontrado no grupo");
-        });
-//        Membro membro = membroRepository.buscaMembro(memberId);
+        Membro membro = membroRepository.buscaMembro(memberId);
         Usuario usuario = membro.getUsuario();
         List<Despesa> despesas = despesaRepository.findByGrupoId(groupId);
         List<Cobranca> cobrancas = cobrancaRepository.findByGrupoIdAndUsuarioId(groupId, usuario.getId());
