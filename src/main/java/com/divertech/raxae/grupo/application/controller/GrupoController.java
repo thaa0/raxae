@@ -51,7 +51,7 @@ public class GrupoController {
                     description = "Ícone do grupo",
                     required = true,
                     content = @Content(
-                            mediaType = MediaType.IMAGE_JPEG_VALUE,
+                            mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
                             schema = @Schema(type = "string", format = "binary")
                     )
             )

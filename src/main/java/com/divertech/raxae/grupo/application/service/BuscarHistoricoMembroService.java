@@ -4,7 +4,9 @@ import com.divertech.raxae.cobranca.domain.Cobranca;
 import com.divertech.raxae.cobranca.domain.Despesa;
 import com.divertech.raxae.cobranca.repository.CobrancaRepository;
 import com.divertech.raxae.cobranca.repository.DespesaRepository;
+import com.divertech.raxae.grupo.application.repository.GrupoRepository;
 import com.divertech.raxae.grupo.application.repository.MembroRepository;
+import com.divertech.raxae.grupo.domain.Grupo;
 import com.divertech.raxae.grupo.domain.Membro;
 import com.divertech.raxae.usuario.application.repository.UsuarioRepository;
 import com.divertech.raxae.usuario.domain.Usuario;
@@ -15,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +26,23 @@ public class BuscarHistoricoMembroService {
 
     private final CobrancaRepository cobrancaRepository;
     private final DespesaRepository despesaRepository;
-    private final MembroRepository membroRepository;
+    private final GrupoRepository grupoRepository;
 
 
     @Transactional(readOnly = true)
     public HistoricoMembroResponse executar(UUID groupId, UUID memberId) {
         log.info("[BuscarHistoricoMembro] Iniciando busca. Grupo: {}, Membro: {}", groupId, memberId);
-        Membro membro = membroRepository.buscaMembro(memberId);
+        Grupo grupo = grupoRepository.buscaGrupoPorId(groupId);
+        Membro membro = grupo.getMembros().stream().map(g -> {
+            if (g.getUsuario().getId().equals(memberId)) {
+                return g;
+            }
+            return null;
+        }).filter(Objects::nonNull).findFirst().orElseThrow(() -> {
+            log.error("[BuscarHistoricoMembro] Membro não encontrado no grupo. Grupo: {}, Membro: {}", groupId, memberId);
+            return new RuntimeException("Membro não encontrado no grupo");
+        });
+//        Membro membro = membroRepository.buscaMembro(memberId);
         Usuario usuario = membro.getUsuario();
         List<Despesa> despesas = despesaRepository.findByGrupoId(groupId);
         List<Cobranca> cobrancas = cobrancaRepository.findByGrupoIdAndUsuarioId(groupId, usuario.getId());

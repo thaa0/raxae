@@ -18,6 +18,7 @@ public class CobrancaResponse {
     private String despesaNome;
     private UUID grupoId;
     private String grupoNome;
+    private String nome;
     private BigDecimal valor;
     private StatusCobranca status;
     private LocalDate dataVencimento;
@@ -32,6 +33,7 @@ public class CobrancaResponse {
                 .despesaNome(cobranca.getDespesa().getNome())
                 .grupoId(cobranca.getDespesa().getGrupo().getId())
                 .grupoNome(cobranca.getDespesa().getGrupo().getNomeGrupo())
+                .nome(cobranca.getUsuario().getNomeCompleto())
                 .valor(cobranca.getValor())
                 .status(cobranca.getStatus())
                 .dataVencimento(cobranca.getDataVencimento())
